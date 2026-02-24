@@ -8,7 +8,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GuiForge",
+  title: "Bloxsmith",
   description: "Generate production-ready Roblox UI with curated style presets",
 };
 

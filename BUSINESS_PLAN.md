@@ -1,4 +1,4 @@
-# GuiForge — Business Plan
+# Bloxsmith — Business Plan
 
 ## Executive Summary
 
@@ -24,7 +24,7 @@ An all-in-one web platform for Roblox development. Generate production-ready UIs
 ### Tools
 
 ```
-GuiForge Platform
+Bloxsmith Platform
   ├── UI Forge    — generate styled Roblox UIs from text descriptions
   ├── Build Forge — generate 3D environments/maps from text descriptions
   ├── Sound Forge — generate game music and SFX via Suno integration
@@ -290,7 +290,7 @@ Roblox runs 400+ AI models, open-sourced their Cube Foundation Model, and Baszuc
 The MCP server (robloxstudio-mcp) stays **free and open source forever**. It's the funnel, the credibility, the community trust, AND the infrastructure backbone.
 
 ```
-Open Source MCP Server (free)          GuiForge Platform (paid)
+Open Source MCP Server (free)          Bloxsmith Platform (paid)
 ├── 10K+ installs                      ├── UI Forge (styled UI generation)
 ├── 200+ GitHub stars                  ├── Build Forge (environment generation)
 ├── 39 tools for Studio                ├── Sound Forge (Suno music/SFX)
@@ -300,7 +300,7 @@ Open Source MCP Server (free)          GuiForge Platform (paid)
 └── Discovery funnel ──────────────────└── Monetization
 ```
 
-The MCP server provides the plugin infrastructure. GuiForge provides the web UI, presets, and tooling on top. They're symbiotic.
+The MCP server provides the plugin infrastructure. Bloxsmith provides the web UI, presets, and tooling on top. They're symbiotic.
 
 ---
 
