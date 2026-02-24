@@ -2,31 +2,40 @@
 
 ## Executive Summary
 
-A web-based tool that generates production-ready Roblox UIs using Claude Sonnet with curated style presets. Users pick a visual style (cartoony, stud, modern flat, anime, etc.), describe their UI in plain English, and get a complete, importable UI they can drop straight into Studio via a plugin.
+An all-in-one web platform for Roblox development. Generate production-ready UIs with curated style presets, build 3D environments, create game music via Suno, and publish directly to Studio through a single plugin (powered by the existing robloxstudio-mcp server). Users bring their own AI keys (OpenAI, Anthropic) so we pay $0 in API costs.
 
-**Price:** $5/month (Creator) / $10/month (Pro) — pricing under review, see Cost Structure
+**Price:** $5/month (Creator) / $15/month (Pro) — pure margin, no API cost burden
 **Target:** 29,000 DevEx-eligible Roblox developers + growing 18+ demographic
 **Revenue target:** $300K–$1.8M/year at moderate penetration
-**Window:** 6–12 months before Roblox's native AI likely absorbs the use case
+**Window:** 6–12 months before Roblox's native AI likely absorbs individual use cases
 
 ---
 
 ## The Problem
 
-1. Roblox UI development is tedious — manually creating Instance hierarchies, tweaking properties, wiring up animations
-2. Existing AI tools generate generic, inconsistent "AI slop" UIs with no style coherence
-3. No tool lets you say "make this look like Adopt Me" or "Blox Fruits style" and get consistent results
-4. Non-dev creators (builders, artists, game designers) can't make UIs at all without scripting knowledge
+1. Roblox development requires juggling multiple disconnected tools (UI editors, building tools, audio sourcing, scripting, publishing)
+2. Existing AI tools are single-purpose and generate generic, inconsistent "AI slop" with no style coherence
+3. No tool lets you say "make this look like Adopt Me" or "Blox Fruits style" and get consistent results across UI, builds, and audio
+4. Non-dev creators (builders, artists, game designers) can't make UIs or complex builds without scripting knowledge
+5. Current AI tools either eat your money with token/credit systems or charge high subscriptions to cover their own API costs
 
 ## The Product
 
-### Core Loop
+### Tools
 
 ```
-Pick Style Preset → Describe UI → Generate → Preview → Export to Studio
+GuiForge Platform
+  ├── UI Forge    — generate styled Roblox UIs from text descriptions
+  ├── Build Forge — generate 3D environments/maps from text descriptions
+  ├── Sound Forge — generate game music and SFX via Suno integration
+  └── Publish     — one-click push to Studio via plugin (auto-publish, insert, update)
 ```
 
-### Style Preset System (The Moat)
+All tools share the same style preset system, the same Studio plugin, and the same BYOK AI connection.
+
+### UI Forge (Primary Tool)
+
+Pick a style preset, describe your UI, get a complete importable UI.
 
 Built from real production game UIs — not AI guesses. See [STYLE_EXTRACTION_PIPELINE.md](./STYLE_EXTRACTION_PIPELINE.md) for the full technical pipeline.
 
@@ -39,22 +48,54 @@ Each preset is a structured design token system defining:
 - Component patterns (how buttons, cards, lists, modals look in this style)
 - Real image assets (button backgrounds, icons, borders) — not placeholders
 
-Presets at launch:
+Style presets at launch:
 - **Cartoony** — bright colors, rounded corners, bouncy animations (Adopt Me, MeepCity)
 - **Modern Flat** — clean minimalism, sharp geometry, subtle shadows (Arsenal, Phantom Forces)
-- **Stud/Classic** — retro Roblox aesthetic, 2012-era styling
 - **Anime** — gradient-heavy, dynamic layouts, particle accents (Blox Fruits, Anime Adventures)
+
+Additional presets post-launch:
+- **Stud/Classic** — retro Roblox aesthetic, 2012-era styling
 - **Horror/Dark** — muted palette, glitch effects, atmospheric (Doors, Apeirophobia)
 
-Users do NOT see raw code during generation. They see a visual preview, then export.
+Users do NOT see raw code during generation. They see a visual preview, then export/publish.
 
-### Studio Plugin Bridge (Required)
+### Build Forge
 
-A free Roblox Studio plugin that:
-- Connects to the web app via local HTTP
-- One-click imports generated UI into Studio's hierarchy
+Describe an environment or map, get generated 3D builds pushed to Studio.
+
+- Leverages the MCP server's existing building tools (create parts, models, terrain)
+- Style presets extend to builds (a "cartoony" tycoon plot vs a "horror" hallway)
+- Outputs Instance hierarchies that get inserted via the plugin
+
+### Sound Forge
+
+Generate game music and SFX via Suno API integration.
+
+- Describe the vibe ("upbeat tycoon lobby music", "horror ambient drone")
+- Style presets suggest audio direction matching the visual style
+- Generated audio uploads to Roblox and returns an asset ID ready to use
+
+### Studio Plugin Bridge
+
+A single free Roblox Studio plugin that:
+- Connects to the web app via local HTTP (uses robloxstudio-mcp infrastructure)
+- One-click imports generated UIs, builds, and audio into Studio
+- Auto-publish: push directly to a live game from the web platform
+- Screenshot/workspace capture for AI context (reference existing UI or builds)
 - Serves as a discovery funnel via Creator Store (free listing)
-- Provides screenshot capture for AI context (reference existing UI)
+
+### BYOK (Bring Your Own Key)
+
+Users connect their own AI provider accounts via OAuth or API key:
+- **Anthropic** (Claude) — recommended for UI and code generation
+- **OpenAI** (GPT) — alternative provider, user's choice
+
+This means:
+- $0 API cost for us per generation
+- Users control their own usage and billing with their AI provider
+- No token/credit anxiety on our side — flat subscription covers platform access
+- Power users who already have API keys get immediate value
+- Platform fee covers infrastructure, presets, plugin, and the tooling — not API pass-through
 
 ### Technical Architecture
 
@@ -62,28 +103,38 @@ A free Roblox Studio plugin that:
 Web App (Next.js 16, App Router, TypeScript, Tailwind v4, shadcn/ui)
   ├── Auth (Supabase Auth — email + Discord OAuth)
   ├── Database (Supabase Postgres + RLS)
-  ├── Style preset library (structured JSON design tokens + asset manifests)
-  ├── Generation engine
-  │   ├── Claude Sonnet 4.6 via @anthropic-ai/sdk (direct, not Vercel AI SDK)
-  │   ├── Prompt caching on system prompt + style tokens (~20-25% input cost savings)
+  ├── BYOK key management (encrypted storage, per-user provider config)
+  ├── UI Forge
+  │   ├── Style preset library (structured JSON design tokens + asset manifests)
+  │   ├── Generation via user's AI key (Anthropic SDK / OpenAI SDK)
+  │   ├── Prompt caching on system prompt + style tokens
   │   ├── Stream server-side → validate against style spec → deliver to client
   │   └── Static validation (property checks, asset ID verification, API checks)
+  ├── Build Forge
+  │   ├── Generation via user's AI key
+  │   ├── Output: Instance hierarchy (Parts, Models, Terrain)
+  │   └── Style-aware environment generation
+  ├── Sound Forge
+  │   ├── Suno API integration
+  │   ├── Auto-upload to Roblox → return asset ID
+  │   └── Style-suggested audio prompts
   ├── Preview renderer (canvas-based approximate preview)
-  ├── Export (Luau code + .rbxmx file + plugin bridge)
+  ├── Export (Luau code + .rbxmx file + plugin bridge + auto-publish)
   └── Payments (Stripe webhooks → Supabase subscription table)
 
-Studio Plugin (free)
-  ├── HTTP listener for web app connection
-  ├── Import generated UI instances
-  └── Screenshot capture for reference
+Studio Plugin (free, single plugin for everything)
+  ├── HTTP listener for web app connection (MCP server infrastructure)
+  ├── Import generated UIs, builds, audio
+  ├── Auto-publish to live games
+  └── Screenshot/workspace capture for reference
 ```
 
 #### Stack Decisions (Rationale)
 
-- **Supabase over Clerk**: auth + DB + RLS in one place eliminates user sync problems. RLS enforces data isolation at the DB level (safety net for solo dev). Discord OAuth is a dashboard toggle. $25/mo Pro covers auth + 8GB Postgres + 100K MAUs.
-- **Sonnet 4.6 over Opus**: Sonnet is the cost/quality sweet spot at $3/$15 per MTok. A complex UI generation costs ~$0.025 with caching vs ~$0.09 on Opus. Defer Opus until Sonnet demonstrably fails on complex UIs. Add Haiku for free tier later.
-- **Anthropic SDK over Vercel AI SDK**: one-shot code generation, not chat. Direct SDK gives full control over prompt caching placement. Vercel AI SDK's `useChat`/`useCompletion` hooks add no value here.
-- **Prompt caching**: system prompt + style tokens (~2,500 tokens) cached and shared across all users of the same style preset. Workspace-level cache, not per-user.
+- **Supabase**: auth + DB + RLS in one place. Discord OAuth is a dashboard toggle. $25/mo Pro covers everything.
+- **BYOK over managed API**: eliminates the entire API cost problem. Subscription revenue is pure margin minus infrastructure. Users who are serious about Roblox dev already have or can get API keys.
+- **Single Studio plugin**: one install covers all tools. Leverages existing MCP server infrastructure for the HTTP bridge, building tools, and publishing. No need for users to install multiple plugins.
+- **Suno for audio**: only viable AI music generation API with quality output. Separate from the BYOK AI providers (we either absorb this cost or pass it through).
 
 ---
 
@@ -91,28 +142,27 @@ Studio Plugin (free)
 
 ### What Exists Today
 
-| Tool | Price | Focus | UI Quality |
-|------|-------|-------|-----------|
-| Metain | $5-20/mo (credits) | General game building | Generic |
-| Rebirth | $7.99/mo | Scripting assistant | No UI focus |
-| SuperbulletAI | Free-$20/mo (tokens) | General game building | "Not functional" per reviews |
-| AI Gen UI Plugin | $4.99 one-time | UI generation (Gemini) | Basic, no style system |
+| Tool | Price | Focus | Weakness |
+|------|-------|-------|----------|
+| Metain | $5-20/mo (credits) | General game building | Credit-based, generic output, no style system |
+| Rebirth | $7.99/mo | Scripting assistant | No UI/build/audio, scripting only |
+| SuperbulletAI | Free-$20/mo (tokens) | General game building | "Not functional" per reviews, token burn |
+| AI Gen UI Plugin | $4.99 one-time | UI generation (Gemini) | Basic, no style system, single-purpose |
 | Uilify | $0.01-0.10/gen | UI generation | Indie beta, minimal users |
-| Roblox Assistant | Free (BYOK) | General Studio AI | No style presets |
+| Roblox Assistant | Free (BYOK) | General Studio AI | No style presets, no build/audio tools |
 
 ### Our Differentiation
 
-1. **Style presets** — no one else has curated, opinionated design systems
-2. **UI-first** — not a general coding tool that also does UI
-3. **Flat pricing** — no credit anxiety, no token burn
-4. **Claude Sonnet 4.6** — strong code generation at a sustainable cost, with prompt caching for style presets
-5. **Visual preview** — see before you export, not "hope the code works"
+1. **All-in-one platform** — UI + builds + audio + publishing in one place, one plugin
+2. **Style presets** — no one else has curated, opinionated design systems that span UI and builds
+3. **BYOK = flat pricing** — no credit anxiety, no token burn, no API cost pass-through
+4. **Single plugin** — leverages our MCP server (10K+ installs, 200+ stars) for everything
+5. **Auto-publish** — generate and push to a live game without touching Studio manually
 
 ### What We're NOT
 
-- Not a general Roblox AI coding assistant (Rebirth, SuperbulletAI own that)
-- Not a game builder (Metain is trying that)
-- Not competing with the free MCP server (that stays open source, acts as funnel)
+- Not a scripting assistant (Rebirth owns that)
+- Not competing with the free MCP server (that stays open source, acts as funnel and infrastructure)
 
 ---
 
@@ -120,21 +170,26 @@ Studio Plugin (free)
 
 ### Tiers
 
-| | Free | Creator ($5/mo) | Pro ($10/mo) |
+| | Free | Creator ($5/mo) | Pro ($15/mo) |
 |--|------|-----------------|-------------|
-| Generations/day | 3 | 50 | Unlimited (fair-use) |
+| Generations/day | 3 | 25 | Unlimited (fair-use) |
+| Tools | UI Forge only | UI + Build + Sound Forge | All tools |
 | Style presets | 2 basic | All presets | All + custom presets |
-| Export formats | Luau code only | Code + .rbxmx + plugin | Code + .rbxmx + plugin |
-| Component library | - | Save & reuse | Save & reuse + share |
-| Priority generation | - | - | Yes |
-| Annual discount | - | $48/yr (20% off) | $96/yr (20% off) |
+| Export formats | Luau code only | Code + .rbxmx + plugin | Code + .rbxmx + plugin + auto-publish |
+| Generation history | Last 10 | Unlimited | Unlimited |
+| Component/build library | - | Save & reuse | Save & reuse + share |
+| Annual discount | - | $48/yr (20% off) | $144/yr (20% off) |
+
+### BYOK Requirement
+
+All tiers require users to connect their own AI provider (Anthropic or OpenAI). The free tier includes 3 generations/day using a shared platform key to let users try before setting up BYOK.
 
 ### Why This Pricing
 
 - **$5 anchors to Roblox Premium** ($4.99/mo, 14.8M subscribers — this audience pays this)
-- **Flat subscription beats tokens/credits** — SuperbulletAI and Bolt.new users hate token burn anxiety
-- **BYOK is a non-starter** — most of the audience is under 24, many are teenagers without API keys
-- **Free tier is essential** — expect 3-5% freemium-to-paid conversion, young audience needs to try first
+- **$15 Pro is justified** by all-in-one tooling (UI + builds + audio + auto-publish)
+- **Flat subscription works** because BYOK means we don't eat API costs
+- **Free tier is essential** — 3 gens/day on our dime lets users try without BYOK setup
 - Budget AI tools show 8-15% monthly churn; annual billing at 20% discount drops churn from ~6.8% to ~2.1%
 
 ### Revenue Projections (Conservative → Optimistic)
@@ -143,39 +198,28 @@ Studio Plugin (free)
 |--------|-------------|----------|-----------|
 | Paying users (month 6) | 200 | 800 | 2,000 |
 | Paying users (month 12) | 500 | 2,000 | 5,000 |
-| Avg revenue/user | $6/mo | $7/mo | $8/mo |
-| Annual revenue (year 1) | $36K | $168K | $480K |
-| Annual revenue (year 2) | $120K | $500K | $1.8M |
+| Avg revenue/user | $8/mo | $10/mo | $12/mo |
+| Annual revenue (year 1) | $48K | $240K | $720K |
+| Annual revenue (year 2) | $160K | $720K | $2.4M |
 
 ### Cost Structure
 
-**Claude API costs (Sonnet 4.6 with prompt caching):**
+**BYOK eliminates API costs.** Users pay their own AI provider directly. Our costs are infrastructure only.
 
-| Generation complexity | Est. cost/generation |
-|---|---|
-| Simple (button, label) | ~$0.006 |
-| Medium (card, form) | ~$0.025 |
-| Complex (shop, inventory) | ~$0.025-0.05 |
+**Platform costs (free tier subsidy):**
+- Free tier uses a shared platform key: ~3 gens/day × $0.006-0.025/gen = ~$0.02-0.08/free user/day
+- At 1,000 free users: ~$20-80/mo in shared key costs (acceptable as acquisition cost)
 
-**Cost per user per month (Sonnet 4.6, with caching):**
+**Suno API costs (Sound Forge):**
+- Suno pricing TBD — either absorb into Pro tier or pass through as a small per-generation fee
+- Limit Sound Forge to Creator/Pro tiers to control costs
 
-| Generations/day | Monthly cost/user |
-|---|---|
-| 5 (free tier, Haiku) | ~$0.90 |
-| 10 | ~$7.20 |
-| 25 | ~$18.00 |
-| 50 | ~$36.00 |
-
-**Pricing tension**: at $10/mo Pro with 50 gens/day, API costs exceed revenue by ~$26/user. Options to resolve:
-1. Raise Pro to $19-29/mo and cap at 25-30 gens/day
-2. Keep $10/mo but cap Creator at 15 gens/day, Pro at 30 gens/day
-3. Test real usage patterns before committing (most users won't hit 50/day)
-
-**Other costs:**
+**Infrastructure:**
 - **Supabase Pro**: $25/mo (auth + DB + storage + RLS)
-- **Infrastructure**: Vercel ~$0-20/mo early stage
+- **Vercel**: $0-20/mo early stage
 - **Stripe fees**: 2.9% + $0.30 per transaction
 - **Domain + misc**: ~$15/mo
+- **Total fixed costs**: ~$60-80/mo (covered by ~8-16 Creator subscriptions)
 
 ---
 
@@ -183,32 +227,34 @@ Studio Plugin (free)
 
 ### Phase 1: Build & Validate (Weeks 1-4)
 
-1. Build MVP web app — core generation loop with 2-3 style presets
-2. Build Studio plugin bridge (free, Creator Store listing)
-3. Record one killer 60-second demo video: "I typed 'cartoony shop UI' and got this"
+1. Build MVP web app — UI Forge with 2-3 style presets + BYOK setup
+2. Build/adapt Studio plugin bridge (single plugin, Creator Store listing)
+3. Record one killer 60-second demo video: "I described a cartoony shop UI and got this in 30 seconds"
 4. Private alpha with 10-20 users from existing MCP server community
 
 ### Phase 2: Launch (Weeks 5-8)
 
-1. **DevForum post** — Community Resources thread with demo GIFs, your credentials (10K MCP installs, 200+ GitHub stars). This is the highest-conversion channel.
-2. **Short-form video blitz** — 3-5 TikTok/YouTube Shorts showing before/after UI generation. "Before: empty StarterGui. After: full Blox Fruits-style inventory in 30 seconds."
+1. **DevForum post** — Community Resources thread with demo GIFs, credentials (10K MCP installs, 200+ GitHub stars). Highest-conversion channel.
+2. **Short-form video blitz** — 3-5 TikTok/YouTube Shorts showing before/after. "Before: empty StarterGui. After: full Blox Fruits-style inventory in 30 seconds."
 3. **Discord seeding** — Post in HiddenDevs (263K), RoDevs (140K), Roblox Studio Community (123K)
 4. **Cross-promote from MCP server** — README mention, GitHub discussions, existing user base
 5. Free tier live, paid tiers gated behind waitlist to create scarcity
+6. **Launch Build Forge** alongside or shortly after UI Forge
 
 ### Phase 3: Growth (Months 3-6)
 
-1. **Creator partnerships** — reach out to Roblox dev YouTubers (AlvinBlox, TheDevKing, GnomeCode) for demo videos. Even one video from a 100K+ channel changes everything.
-2. **Community preset submissions** — let users submit style presets, vote on them, build community ownership
-3. **Template marketplace** — pre-built UI templates (shop system, inventory, settings menu) in each style, some free, some Pro-only
-4. **Referral program** — give 1 month free for each referred paying user
+1. **Creator partnerships** — reach out to Roblox dev YouTubers (AlvinBlox, TheDevKing, GnomeCode) for demo videos
+2. **Sound Forge launch** — Suno integration, new marketing push
+3. **Community preset submissions** — let users submit style presets, vote on them
+4. **Template marketplace** — pre-built UI/build templates in each style
+5. **Referral program** — give 1 month free for each referred paying user
 
 ### Phase 4: Moat Deepening (Months 6-12)
 
-1. Expand preset library based on usage data (which styles get requested most?)
+1. Expand preset library based on usage data
 2. Multi-component generation (full game UI systems, not just individual panels)
-3. Screenshot-to-style extraction ("upload a screenshot of a UI you like, we'll match the style")
-4. Integration with the open-source MCP server for end-to-end workflows
+3. Screenshot-to-style extraction ("upload a screenshot, we'll match the style")
+4. Full game scaffolding (combine UI + builds + audio into a complete game starter)
 
 ---
 
@@ -218,11 +264,12 @@ Studio Plugin (free)
 
 | Risk | Severity | Likelihood | Mitigation |
 |------|----------|-----------|-----------|
-| Roblox ships native UI generation | 10/10 | HIGH (6-18 months) | Style presets create differentiation native tools won't match. Position as "enhances" Roblox AI, not competes. |
-| API costs exceed revenue per user | 8/10 | MEDIUM | Sonnet 4.6 (not Opus) cuts costs ~60%. Prompt caching saves ~20-25% on input. Daily generation caps. Add Haiku for free tier. Monitor real usage before committing to pricing. |
-| Low conversion from free to paid | 7/10 | HIGH | Make free tier useful but constrained. Style presets are the paywall lever. |
-| High monthly churn (8-15%) | 7/10 | HIGH | Annual billing discounts, sticky component library, push for yearly plans |
-| "AI slop" perception | 6/10 | MEDIUM | Style presets ARE the quality control. Curate aggressively, reject low-quality presets. |
+| Roblox ships native AI tools | 10/10 | HIGH (6-18 months) | Style presets + all-in-one integration create differentiation native tools won't match on day one. Position as "enhances" Roblox AI. |
+| BYOK friction kills conversion | 7/10 | MEDIUM | Free tier with shared key lets users try without BYOK. Clear setup guides. OAuth flow for Anthropic/OpenAI if available. |
+| Scope too large, slow to ship | 7/10 | MEDIUM | Ship UI Forge first as primary tool. Build Forge and Sound Forge can launch weeks later. Don't block launch on all tools. |
+| Low conversion from free to paid | 7/10 | HIGH | Make free tier useful but constrained (3 gens, UI only). Style presets + Build/Sound Forge are the paywall levers. |
+| High monthly churn (8-15%) | 7/10 | HIGH | Annual billing discounts, sticky component/build library, push for yearly plans |
+| Suno API changes/costs | 5/10 | MEDIUM | Sound Forge is additive, not core. Can swap providers or drop if economics don't work. |
 
 ### The Roblox Platform Risk (The Big One)
 
@@ -230,27 +277,30 @@ Roblox runs 400+ AI models, open-sourced their Cube Foundation Model, and Baszuc
 
 **The survival strategy:**
 - Ship before RDC 2026 (likely September-October)
-- Build the style preset library deep enough that it's genuinely hard to replicate
+- All-in-one platform is harder to replicate than a single-purpose tool
+- Style preset library depth is genuinely hard to match
 - Position as complementary to Roblox's AI Assistant, not competing
-- If Roblox ships native UI generation, pivot the style system into a "design system manager" that works WITH their tools
-- Maintain the open-source MCP server as goodwill + funnel regardless of what happens
+- If Roblox ships native generation tools, pivot to "design system manager" that works WITH their tools
+- Maintain the open-source MCP server as goodwill + funnel regardless
 
 ---
 
 ## Relationship to the Open-Source MCP Server
 
-The MCP server (robloxstudio-mcp) stays **free and open source forever**. It's the funnel, the credibility, and the community trust.
+The MCP server (robloxstudio-mcp) stays **free and open source forever**. It's the funnel, the credibility, the community trust, AND the infrastructure backbone.
 
 ```
-Open Source MCP Server (free)          GuiForge (paid)
-├── 10K+ installs                      ├── Style-preset UI generation
-├── 200+ GitHub stars                  ├── Visual preview
-├── 39 tools for Studio                ├── Studio plugin bridge
-├── Community trust                    ├── Component library
+Open Source MCP Server (free)          GuiForge Platform (paid)
+├── 10K+ installs                      ├── UI Forge (styled UI generation)
+├── 200+ GitHub stars                  ├── Build Forge (environment generation)
+├── 39 tools for Studio                ├── Sound Forge (Suno music/SFX)
+├── HTTP bridge infrastructure         ├── Auto-publish from web
+├── Building tools                     ├── Style preset library
+├── Community trust                    ├── BYOK AI management
 └── Discovery funnel ──────────────────└── Monetization
 ```
 
-The MCP server README links to the UI tool. The UI tool's Studio plugin uses MCP server infrastructure. They're complementary, not competing.
+The MCP server provides the plugin infrastructure. GuiForge provides the web UI, presets, and tooling on top. They're symbiotic.
 
 ---
 
@@ -259,32 +309,38 @@ The MCP server README links to the UI tool. The UI tool's Studio plugin uses MCP
 ### Must Have (Week 1-2)
 - [ ] Supabase project setup (auth, DB schema, RLS policies)
 - [ ] Auth flow (email + Discord OAuth via Supabase Auth)
+- [ ] BYOK key management (connect Anthropic/OpenAI key, encrypted storage)
 - [ ] 1 style preset fully built (Cartoony) with design tokens + asset manifest
-- [ ] Generation engine (Sonnet 4.6 via @anthropic-ai/sdk, prompt caching enabled)
-- [ ] Basic UI: pick style, type description, get generated UI back
+- [ ] UI Forge: pick style, describe UI, generate via user's AI key
 - [ ] Luau code output with copy button
 - [ ] Basic preview (syntax-highlighted code is fine for MVP)
 
 ### Must Have (Week 3-4)
 - [ ] 2 more style presets (Modern Flat, Anime)
-- [ ] Studio plugin that imports generated UI
+- [ ] Studio plugin (single plugin, imports generated UIs)
 - [ ] .rbxmx export
+- [ ] Build Forge: describe environment, generate via user's AI key, push to Studio
 - [ ] Stripe integration (webhooks → Supabase subscription table)
 - [ ] Generation history (save past generations, RLS-protected)
+- [ ] Free tier with shared platform key (3 gens/day)
+
+### Must Have (Week 5-6)
+- [ ] Sound Forge: Suno integration, generate music/SFX
+- [ ] Auto-publish to live games via plugin
 - [ ] Daily generation caps enforced per tier
 
 ### Nice to Have (Post-Launch)
 - [ ] Visual canvas preview
-- [ ] Component library (save + reuse)
+- [ ] Component/build library (save + reuse)
 - [ ] Screenshot-to-style extraction
 - [ ] Custom preset builder
 - [ ] Community preset marketplace
+- [ ] Full game scaffolding (UI + builds + audio combined)
 
 ### Explicitly NOT in MVP
-- No voxel/map generation (separate product, later)
-- No general scripting (Rebirth/SuperbulletAI territory)
-- No game builder features (Metain territory)
-- No BYOK option (adds complexity, audience doesn't have API keys)
+- No general scripting assistant (Rebirth territory)
+- No visual scripting / logic builder
+- No multiplayer/networking generation
 
 ---
 
@@ -316,24 +372,25 @@ The MCP server README links to the UI tool. The UI tool's Studio plugin uses MCP
 | Month 3 | Free-to-paid conversion | 3%+ |
 | Month 6 | Paying users | 500+ |
 | Month 6 | Monthly churn | <10% |
-| Month 6 | MRR | $3,000+ |
+| Month 6 | MRR | $5,000+ |
 | Month 12 | Paying users | 2,000+ |
-| Month 12 | Annual run rate | $150K+ |
+| Month 12 | Annual run rate | $200K+ |
 | Month 12 | Style presets available | 15+ |
+| Month 12 | Tools live | 3 (UI + Build + Sound) |
 
 ---
 
 ## Decision Points
 
-- **Month 3**: If <50 paying users, reassess product-market fit. Talk to free users about why they won't pay.
-- **Month 6**: If MRR <$2,000, consider pivoting style system into a plugin/preset marketplace instead of SaaS.
-- **RDC 2026**: If Roblox announces native UI generation, pivot to "design system manager" that enhances their native tools with curated presets.
-- **Month 12**: If MRR >$10,000, consider voxel map generation as second product line.
+- **Month 3**: If <50 paying users, reassess product-market fit. Talk to free users about why they won't pay. Is BYOK the friction point?
+- **Month 6**: If MRR <$3,000, consider dropping to UI Forge only and simplifying.
+- **RDC 2026**: If Roblox announces native AI generation, pivot to "design system manager" that enhances their native tools with curated presets.
+- **Month 12**: If MRR >$15,000, consider expanding beyond Roblox (Unity, Unreal indie devs).
 
 ---
 
 ## Summary
 
-The play is simple: **own the style-preset UI niche before Roblox absorbs it**. The MCP server is the trust and funnel. The UI tool is the monetization. Ship fast, make the demo video undeniable, launch on DevForum, and build the preset library deeper than anyone wants to compete with.
+The play: **own the all-in-one AI-powered Roblox dev platform before Roblox absorbs individual use cases**. Style presets are the quality moat. BYOK eliminates the API cost problem. The MCP server is the trust, funnel, and infrastructure backbone. Ship UI Forge fast, stack Build Forge and Sound Forge on top, and build the preset library deeper than anyone wants to compete with.
 
-The window is 6-12 months. Every week of delay is a week closer to Roblox shipping this for free.
+The window is 6-12 months. Ship fast.
