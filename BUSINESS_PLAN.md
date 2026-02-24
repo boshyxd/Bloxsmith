@@ -2,9 +2,9 @@
 
 ## Executive Summary
 
-A web-based tool that generates production-ready Roblox UI code using Claude Opus with curated style presets. Users pick a visual style (cartoony, stud, modern flat, anime, etc.), describe their UI in plain English, and get consistent, high-quality GUI code they can drop into Studio.
+A web-based tool that generates production-ready Roblox UIs using Claude Sonnet with curated style presets. Users pick a visual style (cartoony, stud, modern flat, anime, etc.), describe their UI in plain English, and get a complete, importable UI they can drop straight into Studio via a plugin.
 
-**Price:** $5/month (Creator) / $10/month (Pro)
+**Price:** $5/month (Creator) / $10/month (Pro) — pricing under review, see Cost Structure
 **Target:** 29,000 DevEx-eligible Roblox developers + growing 18+ demographic
 **Revenue target:** $300K–$1.8M/year at moderate penetration
 **Window:** 6–12 months before Roblox's native AI likely absorbs the use case
@@ -59,23 +59,31 @@ A free Roblox Studio plugin that:
 ### Technical Architecture
 
 ```
-Web App (Next.js)
-  ├── Auth (Clerk or Supabase Auth)
-  ├── Style preset library (structured JSON/Luau modules)
+Web App (Next.js 16, App Router, TypeScript, Tailwind v4, shadcn/ui)
+  ├── Auth (Supabase Auth — email + Discord OAuth)
+  ├── Database (Supabase Postgres + RLS)
+  ├── Style preset library (structured JSON design tokens + asset manifests)
   ├── Generation engine
-  │   ├── Claude Opus API (primary)
-  │   ├── System prompt + style tokens injected per request
-  │   ├── Modular decomposition for complex UIs (generate components → assemble)
-  │   └── Static validation (property checks against style spec)
+  │   ├── Claude Sonnet 4.6 via @anthropic-ai/sdk (direct, not Vercel AI SDK)
+  │   ├── Prompt caching on system prompt + style tokens (~20-25% input cost savings)
+  │   ├── Stream server-side → validate against style spec → deliver to client
+  │   └── Static validation (property checks, asset ID verification, API checks)
   ├── Preview renderer (canvas-based approximate preview)
   ├── Export (Luau code + .rbxmx file + plugin bridge)
-  └── Payments (Stripe)
+  └── Payments (Stripe webhooks → Supabase subscription table)
 
 Studio Plugin (free)
   ├── HTTP listener for web app connection
   ├── Import generated UI instances
   └── Screenshot capture for reference
 ```
+
+#### Stack Decisions (Rationale)
+
+- **Supabase over Clerk**: auth + DB + RLS in one place eliminates user sync problems. RLS enforces data isolation at the DB level (safety net for solo dev). Discord OAuth is a dashboard toggle. $25/mo Pro covers auth + 8GB Postgres + 100K MAUs.
+- **Sonnet 4.6 over Opus**: Sonnet is the cost/quality sweet spot at $3/$15 per MTok. A complex UI generation costs ~$0.025 with caching vs ~$0.09 on Opus. Defer Opus until Sonnet demonstrably fails on complex UIs. Add Haiku for free tier later.
+- **Anthropic SDK over Vercel AI SDK**: one-shot code generation, not chat. Direct SDK gives full control over prompt caching placement. Vercel AI SDK's `useChat`/`useCompletion` hooks add no value here.
+- **Prompt caching**: system prompt + style tokens (~2,500 tokens) cached and shared across all users of the same style preset. Workspace-level cache, not per-user.
 
 ---
 
@@ -97,7 +105,7 @@ Studio Plugin (free)
 1. **Style presets** — no one else has curated, opinionated design systems
 2. **UI-first** — not a general coding tool that also does UI
 3. **Flat pricing** — no credit anxiety, no token burn
-4. **Claude Opus** — #1 on WebDev leaderboard, best code generation model available
+4. **Claude Sonnet 4.6** — strong code generation at a sustainable cost, with prompt caching for style presets
 5. **Visual preview** — see before you export, not "hope the code works"
 
 ### What We're NOT
@@ -141,11 +149,33 @@ Studio Plugin (free)
 
 ### Cost Structure
 
-- **Claude API costs**: ~$0.50-2.00 per complex UI generation at Opus pricing. At 50 gens/day per Creator user, worst case ~$30-100/user/month in API costs. Must optimize with caching, prompt engineering, and potentially using Sonnet for simple generations.
-- **Key risk**: API costs could exceed subscription revenue per user. Mitigation: tiered model routing (Haiku for simple, Sonnet for medium, Opus for complex), aggressive prompt caching, component template library to reduce generation scope.
-- **Infrastructure**: Vercel/Cloudflare ~$50-200/mo early stage
+**Claude API costs (Sonnet 4.6 with prompt caching):**
+
+| Generation complexity | Est. cost/generation |
+|---|---|
+| Simple (button, label) | ~$0.006 |
+| Medium (card, form) | ~$0.025 |
+| Complex (shop, inventory) | ~$0.025-0.05 |
+
+**Cost per user per month (Sonnet 4.6, with caching):**
+
+| Generations/day | Monthly cost/user |
+|---|---|
+| 5 (free tier, Haiku) | ~$0.90 |
+| 10 | ~$7.20 |
+| 25 | ~$18.00 |
+| 50 | ~$36.00 |
+
+**Pricing tension**: at $10/mo Pro with 50 gens/day, API costs exceed revenue by ~$26/user. Options to resolve:
+1. Raise Pro to $19-29/mo and cap at 25-30 gens/day
+2. Keep $10/mo but cap Creator at 15 gens/day, Pro at 30 gens/day
+3. Test real usage patterns before committing (most users won't hit 50/day)
+
+**Other costs:**
+- **Supabase Pro**: $25/mo (auth + DB + storage + RLS)
+- **Infrastructure**: Vercel ~$0-20/mo early stage
 - **Stripe fees**: 2.9% + $0.30 per transaction
-- **Domain + misc**: ~$50/mo
+- **Domain + misc**: ~$15/mo
 
 ---
 
@@ -189,7 +219,7 @@ Studio Plugin (free)
 | Risk | Severity | Likelihood | Mitigation |
 |------|----------|-----------|-----------|
 | Roblox ships native UI generation | 10/10 | HIGH (6-18 months) | Style presets create differentiation native tools won't match. Position as "enhances" Roblox AI, not competes. |
-| API costs exceed revenue per user | 8/10 | MEDIUM | Tiered model routing, prompt caching, template library, generation limits |
+| API costs exceed revenue per user | 8/10 | MEDIUM | Sonnet 4.6 (not Opus) cuts costs ~60%. Prompt caching saves ~20-25% on input. Daily generation caps. Add Haiku for free tier. Monitor real usage before committing to pricing. |
 | Low conversion from free to paid | 7/10 | HIGH | Make free tier useful but constrained. Style presets are the paywall lever. |
 | High monthly churn (8-15%) | 7/10 | HIGH | Annual billing discounts, sticky component library, push for yearly plans |
 | "AI slop" perception | 6/10 | MEDIUM | Style presets ARE the quality control. Curate aggressively, reject low-quality presets. |
@@ -227,17 +257,21 @@ The MCP server README links to the UI tool. The UI tool's Studio plugin uses MCP
 ## MVP Scope (What to Build First)
 
 ### Must Have (Week 1-2)
-- [ ] Web app with auth (email + Discord OAuth)
-- [ ] 3 style presets (Cartoony, Modern Flat, Anime)
-- [ ] Text-to-UI generation via Claude API
+- [ ] Supabase project setup (auth, DB schema, RLS policies)
+- [ ] Auth flow (email + Discord OAuth via Supabase Auth)
+- [ ] 1 style preset fully built (Cartoony) with design tokens + asset manifest
+- [ ] Generation engine (Sonnet 4.6 via @anthropic-ai/sdk, prompt caching enabled)
+- [ ] Basic UI: pick style, type description, get generated UI back
 - [ ] Luau code output with copy button
-- [ ] Basic preview (even just syntax-highlighted code is fine for MVP)
+- [ ] Basic preview (syntax-highlighted code is fine for MVP)
 
 ### Must Have (Week 3-4)
-- [ ] Studio plugin that imports generated code
+- [ ] 2 more style presets (Modern Flat, Anime)
+- [ ] Studio plugin that imports generated UI
 - [ ] .rbxmx export
-- [ ] Stripe integration (free + $5 Creator tier)
-- [ ] Generation history (save past generations)
+- [ ] Stripe integration (webhooks → Supabase subscription table)
+- [ ] Generation history (save past generations, RLS-protected)
+- [ ] Daily generation caps enforced per tier
 
 ### Nice to Have (Post-Launch)
 - [ ] Visual canvas preview
