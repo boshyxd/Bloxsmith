@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Eye, EyeOff } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export function Auth2() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,8 +19,8 @@ export function Auth2() {
     setSubmitting(true);
 
     const { error: authError } = isSignUp
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password });
+      ? await getSupabase().auth.signUp({ email, password })
+      : await getSupabase().auth.signInWithPassword({ email, password });
 
     if (authError) {
       setError(authError.message);
@@ -32,7 +32,7 @@ export function Auth2() {
   };
 
   const handleOAuth = async (provider: "discord" | "github") => {
-    await supabase.auth.signInWithOAuth({
+    await getSupabase().auth.signInWithOAuth({
       provider,
       options: { redirectTo: `${window.location.origin}/forge/ui` },
     });

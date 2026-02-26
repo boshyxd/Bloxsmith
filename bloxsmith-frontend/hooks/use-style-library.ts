@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import type { SavedStyle, SerializedInstance, DesignTokens } from "@/lib/studio/types";
 
 export function useStyleLibrary() {
@@ -9,14 +9,14 @@ export function useStyleLibrary() {
   const [loading, setLoading] = useState(true);
 
   const fetchStyles = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await getSupabase().auth.getUser();
     if (!user) {
       setStyles([]);
       setLoading(false);
       return;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("styles")
       .select("*")
       .order("created_at", { ascending: false });
@@ -42,10 +42,10 @@ export function useStyleLibrary() {
 
   const saveStyle = useCallback(
     async (style: { name: string; sourceGame?: string; tree: SerializedInstance; tokens: DesignTokens }): Promise<string> => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getSupabase().auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from("styles")
         .insert({
           user_id: user.id,
@@ -67,7 +67,7 @@ export function useStyleLibrary() {
 
   const deleteStyle = useCallback(
     async (id: string) => {
-      const { error } = await supabase.from("styles").delete().eq("id", id);
+      const { error } = await getSupabase().from("styles").delete().eq("id", id);
       if (error) throw error;
       await fetchStyles();
     },
