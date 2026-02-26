@@ -13,22 +13,35 @@ export function Auth2() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const [confirmationSent, setConfirmationSent] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
 
-    const { error: authError } = isSignUp
-      ? await getSupabase().auth.signUp({ email, password })
-      : await getSupabase().auth.signInWithPassword({ email, password });
-
-    if (authError) {
-      setError(authError.message);
-      setSubmitting(false);
-      return;
+    if (isSignUp) {
+      const { data, error: authError } = await getSupabase().auth.signUp({ email, password });
+      if (authError) {
+        setError(authError.message);
+        setSubmitting(false);
+        return;
+      }
+      if (data.session) {
+        window.location.href = "/forge/ui";
+      } else {
+        setConfirmationSent(true);
+        setSubmitting(false);
+      }
+    } else {
+      const { error: authError } = await getSupabase().auth.signInWithPassword({ email, password });
+      if (authError) {
+        setError(authError.message);
+        setSubmitting(false);
+        return;
+      }
+      window.location.href = "/forge/ui";
     }
-
-    window.location.href = "/forge/ui";
   };
 
   const handleOAuth = async (provider: "discord" | "github") => {
@@ -101,6 +114,25 @@ export function Auth2() {
           className="w-full max-w-md"
         >
           {/* Title */}
+          {confirmationSent && (
+            <div className="text-center space-y-4">
+              <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-white">
+                Check your email
+              </h1>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                We sent a confirmation link to <span className="font-medium text-neutral-900 dark:text-white">{email}</span>
+              </p>
+              <button
+                onClick={() => { setConfirmationSent(false); setIsSignUp(false); }}
+                className="text-sm text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium transition-colors"
+              >
+                Back to sign in
+              </button>
+            </div>
+          )}
+
+          {!confirmationSent && (
+            <>
           <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-white mb-8">
             {isSignUp ? "Sign up" : "Sign in"}
           </h1>
@@ -232,6 +264,8 @@ export function Auth2() {
               </button>
             </p>
           </motion.div>
+            </>
+          )}
         </motion.div>
       </div>
     </div>
