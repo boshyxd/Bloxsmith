@@ -1,0 +1,479 @@
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local Players = game:GetService("Players")
+
+local SERVER_URL = "http://localhost:3000"
+local POLL_INTERVAL = 1
+
+local toolbar = plugin:CreateToolbar("Bloxsmith")
+local button = toolbar:CreateButton("Bloxsmith", "Connect to Bloxsmith web app", "rbxassetid://10734944444")
+
+local widget = plugin:CreateDockWidgetPluginGui(
+	"BloxsmithConnection",
+	DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, false, false, 280, 180, 250, 160)
+)
+widget.Title = "Bloxsmith"
+
+-- UI
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(1, 0, 1, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = widget
+
+local padding = Instance.new("UIPadding")
+padding.PaddingLeft = UDim.new(0, 16)
+padding.PaddingRight = UDim.new(0, 16)
+padding.PaddingTop = UDim.new(0, 16)
+padding.PaddingBottom = UDim.new(0, 16)
+padding.Parent = mainFrame
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 10)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = mainFrame
+
+local codeLabel = Instance.new("TextLabel")
+codeLabel.Size = UDim2.new(1, 0, 0, 16)
+codeLabel.BackgroundTransparency = 1
+codeLabel.Text = "Connection Code"
+codeLabel.TextColor3 = Color3.fromRGB(161, 161, 170)
+codeLabel.TextSize = 12
+codeLabel.Font = Enum.Font.GothamMedium
+codeLabel.TextXAlignment = Enum.TextXAlignment.Left
+codeLabel.LayoutOrder = 1
+codeLabel.Parent = mainFrame
+
+local codeInput = Instance.new("TextBox")
+codeInput.Size = UDim2.new(1, 0, 0, 32)
+codeInput.BackgroundColor3 = Color3.fromRGB(39, 39, 42)
+codeInput.BorderSizePixel = 1
+codeInput.BorderColor3 = Color3.fromRGB(63, 63, 70)
+codeInput.Text = ""
+codeInput.PlaceholderText = "Enter 6-character code"
+codeInput.PlaceholderColor3 = Color3.fromRGB(82, 82, 91)
+codeInput.TextColor3 = Color3.fromRGB(250, 250, 250)
+codeInput.TextSize = 16
+codeInput.Font = Enum.Font.GothamBold
+codeInput.ClearTextOnFocus = false
+codeInput.LayoutOrder = 2
+codeInput.Parent = mainFrame
+
+local codeCorner = Instance.new("UICorner")
+codeCorner.CornerRadius = UDim.new(0, 6)
+codeCorner.Parent = codeInput
+
+local codePadding = Instance.new("UIPadding")
+codePadding.PaddingLeft = UDim.new(0, 10)
+codePadding.PaddingRight = UDim.new(0, 10)
+codePadding.Parent = codeInput
+
+local connectButton = Instance.new("TextButton")
+connectButton.Size = UDim2.new(1, 0, 0, 32)
+connectButton.BackgroundColor3 = Color3.fromRGB(99, 102, 241)
+connectButton.BorderSizePixel = 0
+connectButton.Text = "Connect"
+connectButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+connectButton.TextSize = 14
+connectButton.Font = Enum.Font.GothamBold
+connectButton.LayoutOrder = 3
+connectButton.Parent = mainFrame
+
+local connectCorner = Instance.new("UICorner")
+connectCorner.CornerRadius = UDim.new(0, 6)
+connectCorner.Parent = connectButton
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, 0, 0, 16)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Disconnected"
+statusLabel.TextColor3 = Color3.fromRGB(113, 113, 122)
+statusLabel.TextSize = 12
+statusLabel.Font = Enum.Font.GothamMedium
+statusLabel.TextXAlignment = Enum.TextXAlignment.Center
+statusLabel.LayoutOrder = 4
+statusLabel.Parent = mainFrame
+
+-- State
+
+local connectionCode: string = ""
+local isConnected: boolean = false
+local heartbeatConnection: RBXScriptConnection? = nil
+local lastPoll: number = 0
+
+-- Roblox type serialization
+
+local function serializeColor3(c: Color3): { R: number, G: number, B: number }
+	return { R = c.R, G = c.G, B = c.B }
+end
+
+local function serializeUDim2(u: UDim2): { XScale: number, XOffset: number, YScale: number, YOffset: number }
+	return { XScale = u.X.Scale, XOffset = u.X.Offset, YScale = u.Y.Scale, YOffset = u.Y.Offset }
+end
+
+local function serializeUDim(u: UDim): { Scale: number, Offset: number }
+	return { Scale = u.Scale, Offset = u.Offset }
+end
+
+local function serializeVector2(v: Vector2): { X: number, Y: number }
+	return { X = v.X, Y = v.Y }
+end
+
+local function serializeRect(r: Rect): { Min: { X: number, Y: number }, Max: { X: number, Y: number } }
+	return { Min = { X = r.Min.X, Y = r.Min.Y }, Max = { X = r.Max.X, Y = r.Max.Y } }
+end
+
+local function serializeColorSequence(cs: ColorSequence): { { Time: number, Color: { R: number, G: number, B: number } } }
+	local result = {}
+	for _, kp in cs.Keypoints do
+		table.insert(result, { Time = kp.Time, Color = serializeColor3(kp.Value) })
+	end
+	return result
+end
+
+local function serializeNumberSequence(ns: NumberSequence): { { Time: number, Value: number, Envelope: number } }
+	local result = {}
+	for _, kp in ns.Keypoints do
+		table.insert(result, { Time = kp.Time, Value = kp.Value, Envelope = kp.Envelope })
+	end
+	return result
+end
+
+local function serializeProperty(value: any): any
+	local t = typeof(value)
+	if t == "Color3" then
+		return serializeColor3(value)
+	elseif t == "UDim2" then
+		return serializeUDim2(value)
+	elseif t == "UDim" then
+		return serializeUDim(value)
+	elseif t == "Vector2" then
+		return serializeVector2(value)
+	elseif t == "Rect" then
+		return serializeRect(value)
+	elseif t == "ColorSequence" then
+		return serializeColorSequence(value)
+	elseif t == "NumberSequence" then
+		return serializeNumberSequence(value)
+	elseif t == "EnumItem" then
+		return value.Name
+	elseif t == "number" or t == "string" or t == "boolean" then
+		return value
+	end
+	return nil
+end
+
+local function tryGetProperty(instance: Instance, propName: string): (boolean, any)
+	local ok, val = pcall(function()
+		return (instance :: any)[propName]
+	end)
+	return ok, val
+end
+
+local function readProperties(instance: Instance, propNames: { string }): { [string]: any }
+	local props = {}
+	for _, name in propNames do
+		local ok, val = tryGetProperty(instance, name)
+		if ok and val ~= nil then
+			local serialized = serializeProperty(val)
+			if serialized ~= nil then
+				props[name] = serialized
+			end
+		end
+	end
+	return props
+end
+
+-- Property lists by class
+
+local GUI_OBJECT_PROPS = {
+	"Size", "Position", "AnchorPoint", "BackgroundColor3", "BackgroundTransparency",
+	"BorderSizePixel", "BorderColor3", "ZIndex", "LayoutOrder", "Visible",
+	"ClipsDescendants", "Rotation",
+}
+
+local TEXT_PROPS = {
+	"Text", "TextColor3", "TextSize", "TextXAlignment", "TextYAlignment",
+	"Font", "RichText", "TextWrapped", "TextScaled", "TextTransparency",
+}
+
+local IMAGE_PROPS = {
+	"Image", "ImageColor3", "ImageTransparency", "ScaleType", "SliceCenter",
+}
+
+local CLASS_PROPS: { [string]: { string } } = {
+	ScreenGui = { "IgnoreGuiInset", "DisplayOrder", "ResetOnSpawn" },
+	UICorner = { "CornerRadius" },
+	UIStroke = { "Color", "Thickness", "Transparency", "ApplyStrokeMode" },
+	UIPadding = { "PaddingTop", "PaddingBottom", "PaddingLeft", "PaddingRight" },
+	UIListLayout = { "FillDirection", "HorizontalAlignment", "VerticalAlignment", "Padding", "SortOrder" },
+	UIGridLayout = { "CellPadding", "CellSize", "FillDirection", "SortOrder" },
+	UIGradient = { "Color", "Rotation", "Transparency" },
+	UIScale = { "Scale" },
+	UIAspectRatioConstraint = { "AspectRatio", "AspectType", "DominantAxis" },
+	UISizeConstraint = { "MaxSize", "MinSize" },
+	ScrollingFrame = { "CanvasSize", "ScrollBarThickness", "ScrollBarImageColor3" },
+	ViewportFrame = { "ImageColor3", "ImageTransparency" },
+}
+
+local TEXT_CLASSES = { TextLabel = true, TextButton = true, TextBox = true }
+local IMAGE_CLASSES = { ImageLabel = true, ImageButton = true }
+
+local function getPropertiesForInstance(instance: Instance): { [string]: any }
+	local className = instance.ClassName
+	local propNames = {}
+
+	if instance:IsA("GuiObject") then
+		for _, p in GUI_OBJECT_PROPS do
+			table.insert(propNames, p)
+		end
+	end
+
+	if TEXT_CLASSES[className] then
+		for _, p in TEXT_PROPS do
+			table.insert(propNames, p)
+		end
+	end
+
+	if IMAGE_CLASSES[className] then
+		for _, p in IMAGE_PROPS do
+			table.insert(propNames, p)
+		end
+	end
+
+	local classPropList = CLASS_PROPS[className]
+	if classPropList then
+		for _, p in classPropList do
+			table.insert(propNames, p)
+		end
+	end
+
+	return readProperties(instance, propNames)
+end
+
+local function serializeInstance(instance: Instance): { className: string, name: string, properties: { [string]: any }, children: {} }
+	local data = {
+		className = instance.ClassName,
+		name = instance.Name,
+		properties = getPropertiesForInstance(instance),
+		children = {},
+	}
+
+	for _, child in instance:GetChildren() do
+		table.insert(data.children, serializeInstance(child))
+	end
+
+	return data
+end
+
+-- Resolve a dot-notation path like "game.StarterGui.MainMenu"
+
+local function resolveInstancePath(path: string): Instance?
+	local parts = string.split(path, ".")
+	if #parts == 0 or parts[1] ~= "game" then
+		return nil
+	end
+
+	local current: Instance = game
+	for i = 2, #parts do
+		local child = current:FindFirstChild(parts[i])
+		if not child then
+			return nil
+		end
+		current = child
+	end
+	return current
+end
+
+-- Command handlers
+
+local function handleListScreenGuis(): { success: boolean, data: any }
+	local guis: { string } = {}
+
+	for _, child in StarterGui:GetChildren() do
+		if child:IsA("ScreenGui") then
+			table.insert(guis, child.Name)
+		end
+	end
+
+	local localPlayer = Players.LocalPlayer
+	if localPlayer then
+		local playerGui = localPlayer:FindFirstChild("PlayerGui")
+		if playerGui then
+			for _, child in playerGui:GetChildren() do
+				if child:IsA("ScreenGui") then
+					table.insert(guis, child.Name)
+				end
+			end
+		end
+	end
+
+	return { success = true, data = guis }
+end
+
+local function handleExtractUi(params: { path: string? }): { success: boolean, data: any?, error: string? }
+	local path = params.path
+	if not path then
+		return { success = false, error = "Missing 'path' parameter" }
+	end
+
+	local instance = resolveInstancePath(path)
+	if not instance then
+		return { success = false, error = "Instance not found: " .. path }
+	end
+
+	if not instance:IsA("ScreenGui") then
+		return { success = false, error = "Instance is not a ScreenGui: " .. path }
+	end
+
+	return { success = true, data = serializeInstance(instance) }
+end
+
+local COMMAND_HANDLERS: { [string]: (params: any) -> { success: boolean, data: any?, error: string? } } = {
+	list_screenguis = function(_params)
+		return handleListScreenGuis()
+	end,
+	extract_ui = function(params)
+		return handleExtractUi(params)
+	end,
+}
+
+-- HTTP communication
+
+local function postResponse(requestId: string, result: { success: boolean, data: any?, error: string? })
+	pcall(function()
+		HttpService:RequestAsync({
+			Url = SERVER_URL .. "/api/studio/response",
+			Method = "POST",
+			Headers = { ["Content-Type"] = "application/json" },
+			Body = HttpService:JSONEncode({
+				code = connectionCode,
+				requestId = requestId,
+				data = result.data,
+				error = result.error,
+			}),
+		})
+	end)
+end
+
+local function processCommand(command: { id: string, type: string, data: any? })
+	local handler = COMMAND_HANDLERS[command.type]
+	if not handler then
+		postResponse(command.id, { success = false, error = "Unknown command: " .. command.type })
+		return
+	end
+
+	local ok, result = pcall(handler, command.data or {})
+	if ok then
+		postResponse(command.id, result)
+	else
+		postResponse(command.id, { success = false, error = "Command failed: " .. tostring(result) })
+	end
+end
+
+local disconnect
+
+local function poll()
+	local ok, result = pcall(function()
+		return HttpService:RequestAsync({
+			Url = SERVER_URL .. "/api/studio/poll?code=" .. connectionCode,
+			Method = "GET",
+			Headers = { ["Content-Type"] = "application/json" },
+		})
+	end)
+
+	if not ok or not result.Success then
+		disconnect()
+		return
+	end
+
+	local decodeOk, body = pcall(HttpService.JSONDecode, HttpService, result.Body)
+	if not decodeOk then
+		return
+	end
+
+	if body.command then
+		processCommand(body.command)
+	end
+end
+
+-- Connection lifecycle
+
+disconnect = function()
+	isConnected = false
+	if heartbeatConnection then
+		heartbeatConnection:Disconnect()
+		heartbeatConnection = nil
+	end
+	statusLabel.Text = "Disconnected"
+	statusLabel.TextColor3 = Color3.fromRGB(113, 113, 122)
+	connectButton.Text = "Connect"
+	connectButton.BackgroundColor3 = Color3.fromRGB(99, 102, 241)
+	codeInput.TextEditable = true
+end
+
+local function connect()
+	connectionCode = string.gsub(codeInput.Text, "%s", "")
+	if #connectionCode ~= 6 then
+		statusLabel.Text = "Code must be 6 characters"
+		statusLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
+		return
+	end
+
+	statusLabel.Text = "Connecting..."
+	statusLabel.TextColor3 = Color3.fromRGB(234, 179, 8)
+	codeInput.TextEditable = false
+
+	local ok, result = pcall(function()
+		return HttpService:RequestAsync({
+			Url = SERVER_URL .. "/api/studio/poll?code=" .. connectionCode,
+			Method = "GET",
+			Headers = { ["Content-Type"] = "application/json" },
+		})
+	end)
+
+	if not ok or not result.Success then
+		statusLabel.Text = "Connection failed"
+		statusLabel.TextColor3 = Color3.fromRGB(239, 68, 68)
+		codeInput.TextEditable = true
+		return
+	end
+
+	isConnected = true
+	statusLabel.Text = "Connected"
+	statusLabel.TextColor3 = Color3.fromRGB(34, 197, 94)
+	connectButton.Text = "Disconnect"
+	connectButton.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
+	lastPoll = tick()
+
+	heartbeatConnection = RunService.Heartbeat:Connect(function()
+		if not isConnected then
+			return
+		end
+		local now = tick()
+		if now - lastPoll >= POLL_INTERVAL then
+			lastPoll = now
+			poll()
+		end
+	end)
+end
+
+-- Button handlers
+
+connectButton.Activated:Connect(function()
+	if isConnected then
+		disconnect()
+	else
+		connect()
+	end
+end)
+
+button.Click:Connect(function()
+	widget.Enabled = not widget.Enabled
+end)
+
+plugin.Unloading:Connect(function()
+	disconnect()
+end)
