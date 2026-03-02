@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { useCredits } from "@/hooks/use-credits"
@@ -17,6 +17,14 @@ interface Transaction {
 }
 
 export default function ProfilePage() {
+  return (
+    <Suspense>
+      <ProfileContent />
+    </Suspense>
+  )
+}
+
+function ProfileContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, loading: authLoading } = useAuth()
@@ -245,17 +253,9 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="flex gap-3">
-            {RELOAD_AMOUNTS_CENTS.map((amount) => (
-              <button
-                key={amount}
-                onClick={() => startCheckout(amount)}
-                disabled={loadingCheckout !== null}
-                className="flex-1 px-4 py-2.5 border border-border bg-background text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50"
-              >
-                {loadingCheckout === amount ? "..." : `+$${(amount / 100).toFixed(0)}`}
-              </button>
-            ))}
+          <div className="flex flex-col items-center gap-2 py-4 text-center">
+            <span className="text-3xl">:(</span>
+            <span className="text-sm text-muted-foreground">Purchasing credits is not available at the moment</span>
           </div>
         </div>
 
