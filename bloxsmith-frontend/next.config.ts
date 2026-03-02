@@ -1,8 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  env: {
-    MAINTENANCE_MODE: process.env.MAINTENANCE_MODE || "",
+  async rewrites() {
+    if (process.env.MAINTENANCE_MODE === "true") {
+      return {
+        beforeFiles: [
+          {
+            source: "/((?!maintenance|_next|logos|favicon\\.ico).*)",
+            destination: "/maintenance",
+          },
+        ],
+        afterFiles: [],
+        fallback: [],
+      }
+    }
+    return { beforeFiles: [], afterFiles: [], fallback: [] }
   },
 };
 
