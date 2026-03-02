@@ -58,7 +58,7 @@ export function Navigation7() {
     },
     {
       label: "Pricing",
-      href: "#pricing",
+      href: "/pricing",
     },
     {
       label: "Community",
@@ -109,13 +109,22 @@ export function Navigation7() {
                   onMouseEnter={() => setActiveDropdown(item.label)}
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  <button
-                    className="flex items-center gap-1.5 px-3 h-8 bg-secondary hover:bg-accent rounded-none transition-colors text-sm tracking-tight font-medium text-foreground"
-                    aria-expanded={activeDropdown === item.label}
-                    aria-haspopup="true"
-                  >
-                    {item.label}
-                  </button>
+                  {item.href && !item.dropdown ? (
+                    <a
+                      href={item.href}
+                      className="flex items-center gap-1.5 px-3 h-8 bg-secondary hover:bg-accent rounded-none transition-colors text-sm tracking-tight font-medium text-foreground"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <button
+                      className="flex items-center gap-1.5 px-3 h-8 bg-secondary hover:bg-accent rounded-none transition-colors text-sm tracking-tight font-medium text-foreground"
+                      aria-expanded={activeDropdown === item.label}
+                      aria-haspopup="true"
+                    >
+                      {item.label}
+                    </button>
+                  )}
 
                   {/* Dropdown */}
                   <AnimatePresence>
@@ -245,26 +254,41 @@ export function Navigation7() {
                       ease: [0.4, 0, 0.2, 1],
                     }}
                   >
-                    <button
-                      onClick={() =>
-                        setMobileExpandedItem(
-                          mobileExpandedItem === item.label ? null : item.label,
-                        )
-                      }
-                      className="w-full flex items-center justify-between px-4 py-3 bg-secondary hover:bg-accent rounded-none text-left transition-colors"
-                    >
-                      <span className="font-medium text-foreground">
-                        {item.label}
-                      </span>
-                      <motion.div
-                        animate={{
-                          rotate: mobileExpandedItem === item.label ? 180 : 0,
+                    {item.href && !item.dropdown ? (
+                      <a
+                        href={item.href}
+                        onClick={() => {
+                          setIsMobileMenuOpen(false)
+                          setMobileExpandedItem(null)
                         }}
-                        transition={{ duration: 0.2 }}
+                        className="w-full flex items-center px-4 py-3 bg-secondary hover:bg-accent rounded-none text-left transition-colors"
                       >
-                        <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                      </motion.div>
-                    </button>
+                        <span className="font-medium text-foreground">
+                          {item.label}
+                        </span>
+                      </a>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          setMobileExpandedItem(
+                            mobileExpandedItem === item.label ? null : item.label,
+                          )
+                        }
+                        className="w-full flex items-center justify-between px-4 py-3 bg-secondary hover:bg-accent rounded-none text-left transition-colors"
+                      >
+                        <span className="font-medium text-foreground">
+                          {item.label}
+                        </span>
+                        <motion.div
+                          animate={{
+                            rotate: mobileExpandedItem === item.label ? 180 : 0,
+                          }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                        </motion.div>
+                      </button>
+                    )}
 
                     {/* Expandable Content */}
                     <AnimatePresence>

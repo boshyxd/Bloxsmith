@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { getSupabase } from "@/lib/supabase";
 import type { SerializedInstance } from "@/lib/studio/types";
-import { MODELS, DEFAULT_MODEL, COST_PER_FRAME_CENTS } from "@/lib/billing";
+import { MODELS, DEFAULT_MODEL, COST_PER_FRAME_CENTS, TOKEN_MARKUP } from "@/lib/billing";
 import { parseLuauToTrees } from "@/lib/studio/luau-to-tree";
 import { serializeToRbxmx } from "@/lib/studio/rbxmx-serializer";
 import { condenseTrees, estimateTokens } from "@/lib/studio/styles/registry";
@@ -458,7 +458,7 @@ export function ChatPanel({
                           <span className="text-xs font-medium text-foreground">{m.name}</span>
                           <span className="text-[10px] text-muted-foreground">
                             {isAdaptive
-                              ? `$${((m.inputCostPerMillionTokens + m.outputCostPerMillionTokens) / 10).toFixed(2)}/M tokens`
+                              ? `in $${(m.inputCostPerMillionTokens * TOKEN_MARKUP).toFixed(2)} · out $${(m.outputCostPerMillionTokens * TOKEN_MARKUP).toFixed(2)} /M`
                               : `$${(COST_PER_FRAME_CENTS[m.id] / 100).toFixed(2)}/frame`}
                           </span>
                         </div>

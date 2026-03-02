@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 import { useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { MODELS, TOKEN_MARKUP } from "@/lib/billing";
 
 const MovingBorder = ({
   children,
@@ -132,11 +133,16 @@ export default function Pricing1() {
                   <div className="text-secondary-foreground text-sm sm:text-base">
                     <span className="font-medium text-foreground">Adaptive</span> — token-based pricing
                     <span className="block text-muted-foreground text-xs mt-0.5">
-                      <span className="font-medium text-foreground/70">Spark</span> $0.39/M
-                      <span className="mx-1 text-muted-foreground">·</span>
-                      <span className="font-medium text-foreground/70">Forge</span> $14/M
-                      <span className="mx-1 text-muted-foreground">·</span>
-                      <span className="font-medium text-foreground/70">Anvil</span> $90/M tokens
+                      Input / output per M tokens
+                    </span>
+                    <span className="block text-muted-foreground text-xs mt-1">
+                      {Object.values(MODELS).map((m, i) => (
+                        <span key={m.id}>
+                          {i > 0 && <span className="mx-1.5 text-muted-foreground">·</span>}
+                          <span className="font-medium text-foreground/70">{m.name}</span>
+                          {" "}${(m.inputCostPerMillionTokens * TOKEN_MARKUP).toFixed(2)} / ${(m.outputCostPerMillionTokens * TOKEN_MARKUP).toFixed(2)}
+                        </span>
+                      ))}
                     </span>
                   </div>
                 </div>

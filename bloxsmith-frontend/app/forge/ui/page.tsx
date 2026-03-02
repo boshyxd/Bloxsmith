@@ -11,6 +11,7 @@ import { StylePicker } from "@/components/forge/style-picker";
 import { useStudioConnection } from "@/hooks/use-studio-connection";
 import { useAuth } from "@/hooks/use-auth";
 import { useCredits } from "@/hooks/use-credits";
+import { OnboardingOverlay } from "@/components/forge/onboarding-overlay";
 import { DEFAULT_STYLE_ID } from "@/lib/studio/styles/presets";
 import type { SerializedInstance } from "@/lib/studio/types";
 
@@ -108,30 +109,38 @@ export default function UIForgePage() {
       <div className="hidden md:grid h-screen grid-cols-[260px_1fr_280px] grid-rows-[48px_1fr]">
         <StudioToolbar
           styleSlot={
-            <StylePicker
-              selectedStyleId={selectedStyleId}
-              onSelect={setSelectedStyleId}
-              studioConnected={connection.connected}
-              hasUIs={visibleTrees.length > 0}
-            />
+            <span data-onboarding="style">
+              <StylePicker
+                selectedStyleId={selectedStyleId}
+                onSelect={setSelectedStyleId}
+                studioConnected={connection.connected}
+                hasUIs={visibleTrees.length > 0}
+              />
+            </span>
           }
           creditsSlot={
-            <a
-              href="/profile"
-              className="flex items-center gap-2 px-2.5 h-7 rounded-none border border-border text-xs hover:bg-accent transition-colors"
-            >
-              {credits.freeGensRemaining > 0 ? (
-                <span className="text-foreground font-medium">
-                  {credits.freeGensRemaining} free gen{credits.freeGensRemaining !== 1 ? "s" : ""}
-                </span>
-              ) : (
-                <span className="text-foreground font-medium">
-                  ${(credits.balanceCents / 100).toFixed(2)}
-                </span>
-              )}
-            </a>
+            <span data-onboarding="credits">
+              <a
+                href="/profile"
+                className="flex items-center gap-2 px-2.5 h-7 rounded-none border border-border text-xs hover:bg-accent transition-colors"
+              >
+                {credits.freeGensRemaining > 0 ? (
+                  <span className="text-foreground font-medium">
+                    {credits.freeGensRemaining} free gen{credits.freeGensRemaining !== 1 ? "s" : ""}
+                  </span>
+                ) : (
+                  <span className="text-foreground font-medium">
+                    ${(credits.balanceCents / 100).toFixed(2)}
+                  </span>
+                )}
+              </a>
+            </span>
           }
-          connectionSlot={<ConnectDialog connection={connection} />}
+          connectionSlot={
+            <span data-onboarding="connect">
+              <ConnectDialog connection={connection} />
+            </span>
+          }
         />
         <AssetSidebar
           selectedElementId={selectedElementId}
@@ -140,16 +149,19 @@ export default function UIForgePage() {
           hiddenTreeNames={hiddenTreeNames}
           onToggleTreeVisibility={toggleTreeVisibility}
         />
-        <ChatPanel
-          trees={visibleTrees}
-          studioConnected={connection.connected}
-          onSendToStudio={sendToStudio}
-          balanceCents={credits.balanceCents}
-          freeGensRemaining={credits.freeGensRemaining}
-          onGenerationComplete={credits.refetch}
-          styleId={selectedStyleId}
-        />
+        <div data-onboarding="chat" className="min-h-0 grid">
+          <ChatPanel
+            trees={visibleTrees}
+            studioConnected={connection.connected}
+            onSendToStudio={sendToStudio}
+            balanceCents={credits.balanceCents}
+            freeGensRemaining={credits.freeGensRemaining}
+            onGenerationComplete={credits.refetch}
+            styleId={selectedStyleId}
+          />
+        </div>
         <PropertiesPanel trees={trees} selectedElementId={selectedElementId} />
+        <OnboardingOverlay />
       </div>
     </>
   );

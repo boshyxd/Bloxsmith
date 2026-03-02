@@ -159,13 +159,26 @@ export function Auth2() {
                   </svg>
                   Sign in with GitHub
                 </motion.button>
+
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.4 }}
+                  onClick={() => { window.location.href = "/api/auth/roblox" }}
+                  className="w-full px-6 py-3 rounded-none border border-border bg-card text-foreground font-medium hover:bg-accent transition-colors duration-200 flex items-center justify-center gap-3"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4.014 0L0 19.986 19.986 24 24 4.014 4.014 0zm10.147 14.654l-4.795-1.18 1.18-4.795 4.795 1.18-1.18 4.795z" />
+                  </svg>
+                  Sign in with Roblox
+                </motion.button>
               </div>
 
               {/* Divider */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.4 }}
+                transition={{ duration: 0.4, delay: 0.45 }}
                 className="flex items-center gap-4 mb-6"
               >
                 <div className="flex-1 h-px bg-border" />
@@ -177,7 +190,7 @@ export function Auth2() {
               <motion.form
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.45 }}
+                transition={{ duration: 0.4, delay: 0.5 }}
                 onSubmit={handleSubmit}
                 className="space-y-4"
               >
@@ -234,7 +247,7 @@ export function Auth2() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.5 }}
+                transition={{ duration: 0.4, delay: 0.55 }}
                 className="mt-6 space-y-3 text-center"
               >
                 <a

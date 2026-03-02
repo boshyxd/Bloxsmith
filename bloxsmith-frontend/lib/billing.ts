@@ -16,8 +16,8 @@ export const MODELS: Record<string, ModelTier> = {
     id: "spark",
     name: "Spark",
     openRouterId: "z-ai/glm-5",
-    inputCostPerMillionTokens: 0.195,
-    outputCostPerMillionTokens: 0.195,
+    inputCostPerMillionTokens: 0.95,
+    outputCostPerMillionTokens: 2.55,
     description: "Fast",
   },
   forge: {
@@ -32,8 +32,8 @@ export const MODELS: Record<string, ModelTier> = {
     id: "anvil",
     name: "Anvil",
     openRouterId: "anthropic/claude-opus-4.6",
-    inputCostPerMillionTokens: 15,
-    outputCostPerMillionTokens: 75,
+    inputCostPerMillionTokens: 5,
+    outputCostPerMillionTokens: 25,
     description: "Powerful",
   },
 }
@@ -55,5 +55,5 @@ export function calculateCostCents(
 ): number {
   const inputCost = (inputTokens / 1_000_000) * model.inputCostPerMillionTokens
   const outputCost = (outputTokens / 1_000_000) * model.outputCostPerMillionTokens
-  return Math.ceil((inputCost + outputCost) * 100)
+  return Math.ceil((inputCost + outputCost) * TOKEN_MARKUP * 100)
 }

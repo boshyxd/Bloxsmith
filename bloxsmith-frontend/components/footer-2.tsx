@@ -101,7 +101,7 @@ export default function Footer2() {
                 className="flex flex-wrap items-center justify-center gap-3 text-sm text-foreground sm:gap-4 sm:text-base"
               >
                 <a
-                  href="#pricing"
+                  href="/pricing"
                   className="transition-colors hover:text-muted-foreground"
                 >
                   PRICING
