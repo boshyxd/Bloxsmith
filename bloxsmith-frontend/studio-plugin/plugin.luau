@@ -3,7 +3,7 @@ local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local Players = game:GetService("Players")
 
-local SERVER_URL = "http://localhost:3000"
+local SERVER_URL = "https://bloxsmith.net"
 local POLL_INTERVAL = 1
 
 local toolbar = plugin:CreateToolbar("Bloxsmith")
@@ -331,12 +331,34 @@ local function handleExtractUi(params: { path: string? }): { success: boolean, d
 	return { success = true, data = serializeInstance(instance) }
 end
 
+local function handleExecuteLuau(params: { code: string? }): { success: boolean, data: any?, error: string? }
+	local source = params.code
+	if not source then
+		return { success = false, error = "Missing 'code' parameter" }
+	end
+
+	local fn, compileErr = loadstring(source)
+	if not fn then
+		return { success = false, error = "Compile error: " .. tostring(compileErr) }
+	end
+
+	local ok, runtimeErr = pcall(fn)
+	if not ok then
+		return { success = false, error = "Runtime error: " .. tostring(runtimeErr) }
+	end
+
+	return { success = true, data = "Executed successfully" }
+end
+
 local COMMAND_HANDLERS: { [string]: (params: any) -> { success: boolean, data: any?, error: string? } } = {
 	list_screenguis = function(_params)
 		return handleListScreenGuis()
 	end,
 	extract_ui = function(params)
 		return handleExtractUi(params)
+	end,
+	execute_luau = function(params)
+		return handleExecuteLuau(params)
 	end,
 }
 

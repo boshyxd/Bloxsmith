@@ -1,0 +1,667 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="www.roblox.com/roblox.xsd" version="4">
+  <Item class="ScreenGui" referent="RBX00000000000000000">
+    <Properties>
+      <string name="Name">BloxsmithExport</string>
+      <token name="ZIndexBehavior">1</token>
+      <bool name="ResetOnSpawn">false</bool>
+      <bool name="IgnoreGuiInset">true</bool>
+    </Properties>
+    <Item class="Frame" referent="RBX00000000000000001">
+      <Properties>
+        <string name="Name">MainContainer</string>
+        <UDim2 name="Size">
+          <XS>0</XS>
+          <XO>420</XO>
+          <YS>0</YS>
+          <YO>320</YO>
+        </UDim2>
+        <UDim2 name="Position">
+          <XS>0.5</XS>
+          <XO>-210</XO>
+          <YS>0.5</YS>
+          <YO>-160</YO>
+        </UDim2>
+        <Vector2 name="AnchorPoint">
+          <X>0</X>
+          <Y>0</Y>
+        </Vector2>
+        <Color3 name="BackgroundColor3">
+          <R>0.12</R>
+          <G>0.12</G>
+          <B>0.14</B>
+        </Color3>
+        <float name="BackgroundTransparency">0</float>
+        <int name="BorderSizePixel">0</int>
+        <bool name="ClipsDescendants">true</bool>
+      </Properties>
+      <Item class="UICorner" referent="RBX00000000000000002">
+        <Properties>
+          <string name="Name">UICorner</string>
+          <UDim name="CornerRadius">
+            <S>0</S>
+            <O>12</O>
+          </UDim>
+        </Properties>
+      </Item>
+      <Item class="UIStroke" referent="RBX00000000000000003">
+        <Properties>
+          <string name="Name">UIStroke</string>
+          <Color3 name="Color">
+            <R>0.25</R>
+            <G>0.25</G>
+            <B>0.3</B>
+          </Color3>
+          <float name="Thickness">1</float>
+          <float name="Transparency">0</float>
+        </Properties>
+      </Item>
+      <Item class="UIPadding" referent="RBX00000000000000004">
+        <Properties>
+          <string name="Name">UIPadding</string>
+          <UDim name="PaddingTop">
+            <S>0</S>
+            <O>16</O>
+          </UDim>
+          <UDim name="PaddingBottom">
+            <S>0</S>
+            <O>16</O>
+          </UDim>
+          <UDim name="PaddingLeft">
+            <S>0</S>
+            <O>16</O>
+          </UDim>
+          <UDim name="PaddingRight">
+            <S>0</S>
+            <O>16</O>
+          </UDim>
+        </Properties>
+      </Item>
+      <Item class="UIListLayout" referent="RBX00000000000000005">
+        <Properties>
+          <string name="Name">UIListLayout</string>
+          <token name="FillDirection">1</token>
+          <token name="HorizontalAlignment">0</token>
+          <token name="VerticalAlignment">1</token>
+          <UDim name="Padding">
+            <S>0</S>
+            <O>12</O>
+          </UDim>
+          <token name="SortOrder">1</token>
+        </Properties>
+      </Item>
+      <Item class="TextLabel" referent="RBX00000000000000006">
+        <Properties>
+          <string name="Name">Title</string>
+          <UDim2 name="Size">
+            <XS>1</XS>
+            <XO>0</XO>
+            <YS>0</YS>
+            <YO>36</YO>
+          </UDim2>
+          <float name="BackgroundTransparency">1</float>
+          <string name="Text">Inventory</string>
+          <Color3 name="TextColor3">
+            <R>1</R>
+            <G>1</G>
+            <B>1</B>
+          </Color3>
+          <float name="TextSize">22</float>
+          <token name="Font">18</token>
+          <token name="TextXAlignment">0</token>
+          <int name="LayoutOrder">0</int>
+        </Properties>
+      </Item>
+      <Item class="Frame" referent="RBX00000000000000007">
+        <Properties>
+          <string name="Name">Divider</string>
+          <UDim2 name="Size">
+            <XS>1</XS>
+            <XO>0</XO>
+            <YS>0</YS>
+            <YO>1</YO>
+          </UDim2>
+          <Color3 name="BackgroundColor3">
+            <R>0.3</R>
+            <G>0.3</G>
+            <B>0.35</B>
+          </Color3>
+          <float name="BackgroundTransparency">0</float>
+          <int name="BorderSizePixel">0</int>
+          <int name="LayoutOrder">1</int>
+        </Properties>
+      </Item>
+      <Item class="ScrollingFrame" referent="RBX00000000000000008">
+        <Properties>
+          <string name="Name">ItemGrid</string>
+          <UDim2 name="Size">
+            <XS>1</XS>
+            <XO>0</XO>
+            <YS>1</YS>
+            <YO>-49</YO>
+          </UDim2>
+          <float name="BackgroundTransparency">1</float>
+          <int name="BorderSizePixel">0</int>
+          <UDim2 name="CanvasSize">
+            <XS>0</XS>
+            <XO>0</XO>
+            <YS>2</YS>
+            <YO>0</YO>
+          </UDim2>
+          <float name="ScrollBarThickness">4</float>
+          <Color3 name="ScrollBarImageColor3">
+            <R>0.4</R>
+            <G>0.4</G>
+            <B>0.45</B>
+          </Color3>
+          <int name="LayoutOrder">2</int>
+          <bool name="ClipsDescendants">true</bool>
+        </Properties>
+        <Item class="UIGridLayout" referent="RBX00000000000000009">
+          <Properties>
+            <string name="Name">UIGridLayout</string>
+            <UDim2 name="CellPadding">
+              <XS>0</XS>
+              <XO>8</XO>
+              <YS>0</YS>
+              <YO>8</YO>
+            </UDim2>
+            <UDim2 name="CellSize">
+              <XS>0</XS>
+              <XO>80</XO>
+              <YS>0</YS>
+              <YO>80</YO>
+            </UDim2>
+            <token name="SortOrder">1</token>
+          </Properties>
+        </Item>
+        <Item class="Frame" referent="RBX00000000000000010">
+          <Properties>
+            <string name="Name">Slot1</string>
+            <Color3 name="BackgroundColor3">
+              <R>0.18</R>
+              <G>0.18</G>
+              <B>0.22</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <int name="LayoutOrder">0</int>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000011">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>8</O>
+              </UDim>
+            </Properties>
+          </Item>
+          <Item class="UIStroke" referent="RBX00000000000000012">
+            <Properties>
+              <string name="Name">UIStroke</string>
+              <Color3 name="Color">
+                <R>0.3</R>
+                <G>0.3</G>
+                <B>0.35</B>
+              </Color3>
+              <float name="Thickness">1</float>
+              <float name="Transparency">0.5</float>
+            </Properties>
+          </Item>
+          <Item class="TextLabel" referent="RBX00000000000000013">
+            <Properties>
+              <string name="Name">SlotLabel</string>
+              <UDim2 name="Size">
+                <XS>1</XS>
+                <XO>0</XO>
+                <YS>1</YS>
+                <YO>0</YO>
+              </UDim2>
+              <float name="BackgroundTransparency">1</float>
+              <string name="Text">1</string>
+              <Color3 name="TextColor3">
+                <R>0.5</R>
+                <G>0.5</G>
+                <B>0.55</B>
+              </Color3>
+              <float name="TextSize">14</float>
+              <token name="Font">17</token>
+            </Properties>
+          </Item>
+        </Item>
+        <Item class="Frame" referent="RBX00000000000000014">
+          <Properties>
+            <string name="Name">Slot2</string>
+            <Color3 name="BackgroundColor3">
+              <R>0.18</R>
+              <G>0.18</G>
+              <B>0.22</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <int name="LayoutOrder">1</int>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000015">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>8</O>
+              </UDim>
+            </Properties>
+          </Item>
+          <Item class="UIStroke" referent="RBX00000000000000016">
+            <Properties>
+              <string name="Name">UIStroke</string>
+              <Color3 name="Color">
+                <R>0.3</R>
+                <G>0.3</G>
+                <B>0.35</B>
+              </Color3>
+              <float name="Thickness">1</float>
+              <float name="Transparency">0.5</float>
+            </Properties>
+          </Item>
+          <Item class="TextLabel" referent="RBX00000000000000017">
+            <Properties>
+              <string name="Name">SlotLabel</string>
+              <UDim2 name="Size">
+                <XS>1</XS>
+                <XO>0</XO>
+                <YS>1</YS>
+                <YO>0</YO>
+              </UDim2>
+              <float name="BackgroundTransparency">1</float>
+              <string name="Text">2</string>
+              <Color3 name="TextColor3">
+                <R>0.5</R>
+                <G>0.5</G>
+                <B>0.55</B>
+              </Color3>
+              <float name="TextSize">14</float>
+              <token name="Font">17</token>
+            </Properties>
+          </Item>
+        </Item>
+        <Item class="Frame" referent="RBX00000000000000018">
+          <Properties>
+            <string name="Name">Slot3</string>
+            <Color3 name="BackgroundColor3">
+              <R>0.18</R>
+              <G>0.18</G>
+              <B>0.22</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <int name="LayoutOrder">2</int>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000019">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>8</O>
+              </UDim>
+            </Properties>
+          </Item>
+          <Item class="UIStroke" referent="RBX00000000000000020">
+            <Properties>
+              <string name="Name">UIStroke</string>
+              <Color3 name="Color">
+                <R>0.3</R>
+                <G>0.3</G>
+                <B>0.35</B>
+              </Color3>
+              <float name="Thickness">1</float>
+              <float name="Transparency">0.5</float>
+            </Properties>
+          </Item>
+          <Item class="TextLabel" referent="RBX00000000000000021">
+            <Properties>
+              <string name="Name">SlotLabel</string>
+              <UDim2 name="Size">
+                <XS>1</XS>
+                <XO>0</XO>
+                <YS>1</YS>
+                <YO>0</YO>
+              </UDim2>
+              <float name="BackgroundTransparency">1</float>
+              <string name="Text">3</string>
+              <Color3 name="TextColor3">
+                <R>0.5</R>
+                <G>0.5</G>
+                <B>0.55</B>
+              </Color3>
+              <float name="TextSize">14</float>
+              <token name="Font">17</token>
+            </Properties>
+          </Item>
+        </Item>
+        <Item class="Frame" referent="RBX00000000000000022">
+          <Properties>
+            <string name="Name">Slot4</string>
+            <Color3 name="BackgroundColor3">
+              <R>0.18</R>
+              <G>0.18</G>
+              <B>0.22</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <int name="LayoutOrder">3</int>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000023">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>8</O>
+              </UDim>
+            </Properties>
+          </Item>
+          <Item class="UIStroke" referent="RBX00000000000000024">
+            <Properties>
+              <string name="Name">UIStroke</string>
+              <Color3 name="Color">
+                <R>0.3</R>
+                <G>0.3</G>
+                <B>0.35</B>
+              </Color3>
+              <float name="Thickness">1</float>
+              <float name="Transparency">0.5</float>
+            </Properties>
+          </Item>
+          <Item class="TextLabel" referent="RBX00000000000000025">
+            <Properties>
+              <string name="Name">SlotLabel</string>
+              <UDim2 name="Size">
+                <XS>1</XS>
+                <XO>0</XO>
+                <YS>1</YS>
+                <YO>0</YO>
+              </UDim2>
+              <float name="BackgroundTransparency">1</float>
+              <string name="Text">4</string>
+              <Color3 name="TextColor3">
+                <R>0.5</R>
+                <G>0.5</G>
+                <B>0.55</B>
+              </Color3>
+              <float name="TextSize">14</float>
+              <token name="Font">17</token>
+            </Properties>
+          </Item>
+        </Item>
+        <Item class="Frame" referent="RBX00000000000000026">
+          <Properties>
+            <string name="Name">Slot5</string>
+            <Color3 name="BackgroundColor3">
+              <R>0.18</R>
+              <G>0.18</G>
+              <B>0.22</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <int name="LayoutOrder">4</int>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000027">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>8</O>
+              </UDim>
+            </Properties>
+          </Item>
+          <Item class="UIStroke" referent="RBX00000000000000028">
+            <Properties>
+              <string name="Name">UIStroke</string>
+              <Color3 name="Color">
+                <R>0.3</R>
+                <G>0.3</G>
+                <B>0.35</B>
+              </Color3>
+              <float name="Thickness">1</float>
+              <float name="Transparency">0.5</float>
+            </Properties>
+          </Item>
+          <Item class="TextLabel" referent="RBX00000000000000029">
+            <Properties>
+              <string name="Name">SlotLabel</string>
+              <UDim2 name="Size">
+                <XS>1</XS>
+                <XO>0</XO>
+                <YS>1</YS>
+                <YO>0</YO>
+              </UDim2>
+              <float name="BackgroundTransparency">1</float>
+              <string name="Text">5</string>
+              <Color3 name="TextColor3">
+                <R>0.5</R>
+                <G>0.5</G>
+                <B>0.55</B>
+              </Color3>
+              <float name="TextSize">14</float>
+              <token name="Font">17</token>
+            </Properties>
+          </Item>
+        </Item>
+        <Item class="Frame" referent="RBX00000000000000030">
+          <Properties>
+            <string name="Name">Slot6</string>
+            <Color3 name="BackgroundColor3">
+              <R>0.18</R>
+              <G>0.18</G>
+              <B>0.22</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <int name="LayoutOrder">5</int>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000031">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>8</O>
+              </UDim>
+            </Properties>
+          </Item>
+          <Item class="UIStroke" referent="RBX00000000000000032">
+            <Properties>
+              <string name="Name">UIStroke</string>
+              <Color3 name="Color">
+                <R>0.3</R>
+                <G>0.3</G>
+                <B>0.35</B>
+              </Color3>
+              <float name="Thickness">1</float>
+              <float name="Transparency">0.5</float>
+            </Properties>
+          </Item>
+          <Item class="TextLabel" referent="RBX00000000000000033">
+            <Properties>
+              <string name="Name">SlotLabel</string>
+              <UDim2 name="Size">
+                <XS>1</XS>
+                <XO>0</XO>
+                <YS>1</YS>
+                <YO>0</YO>
+              </UDim2>
+              <float name="BackgroundTransparency">1</float>
+              <string name="Text">6</string>
+              <Color3 name="TextColor3">
+                <R>0.5</R>
+                <G>0.5</G>
+                <B>0.55</B>
+              </Color3>
+              <float name="TextSize">14</float>
+              <token name="Font">17</token>
+            </Properties>
+          </Item>
+        </Item>
+        <Item class="Frame" referent="RBX00000000000000034">
+          <Properties>
+            <string name="Name">Slot7</string>
+            <Color3 name="BackgroundColor3">
+              <R>0.18</R>
+              <G>0.18</G>
+              <B>0.22</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <int name="LayoutOrder">6</int>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000035">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>8</O>
+              </UDim>
+            </Properties>
+          </Item>
+          <Item class="UIStroke" referent="RBX00000000000000036">
+            <Properties>
+              <string name="Name">UIStroke</string>
+              <Color3 name="Color">
+                <R>0.3</R>
+                <G>0.3</G>
+                <B>0.35</B>
+              </Color3>
+              <float name="Thickness">1</float>
+              <float name="Transparency">0.5</float>
+            </Properties>
+          </Item>
+          <Item class="TextLabel" referent="RBX00000000000000037">
+            <Properties>
+              <string name="Name">SlotLabel</string>
+              <UDim2 name="Size">
+                <XS>1</XS>
+                <XO>0</XO>
+                <YS>1</YS>
+                <YO>0</YO>
+              </UDim2>
+              <float name="BackgroundTransparency">1</float>
+              <string name="Text">7</string>
+              <Color3 name="TextColor3">
+                <R>0.5</R>
+                <G>0.5</G>
+                <B>0.55</B>
+              </Color3>
+              <float name="TextSize">14</float>
+              <token name="Font">17</token>
+            </Properties>
+          </Item>
+        </Item>
+        <Item class="Frame" referent="RBX00000000000000038">
+          <Properties>
+            <string name="Name">Slot8</string>
+            <Color3 name="BackgroundColor3">
+              <R>0.18</R>
+              <G>0.18</G>
+              <B>0.22</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <int name="LayoutOrder">7</int>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000039">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>8</O>
+              </UDim>
+            </Properties>
+          </Item>
+          <Item class="UIStroke" referent="RBX00000000000000040">
+            <Properties>
+              <string name="Name">UIStroke</string>
+              <Color3 name="Color">
+                <R>0.3</R>
+                <G>0.3</G>
+                <B>0.35</B>
+              </Color3>
+              <float name="Thickness">1</float>
+              <float name="Transparency">0.5</float>
+            </Properties>
+          </Item>
+          <Item class="TextLabel" referent="RBX00000000000000041">
+            <Properties>
+              <string name="Name">SlotLabel</string>
+              <UDim2 name="Size">
+                <XS>1</XS>
+                <XO>0</XO>
+                <YS>1</YS>
+                <YO>0</YO>
+              </UDim2>
+              <float name="BackgroundTransparency">1</float>
+              <string name="Text">8</string>
+              <Color3 name="TextColor3">
+                <R>0.5</R>
+                <G>0.5</G>
+                <B>0.55</B>
+              </Color3>
+              <float name="TextSize">14</float>
+              <token name="Font">17</token>
+            </Properties>
+          </Item>
+        </Item>
+      </Item>
+      <Item class="Frame" referent="RBX00000000000000042">
+        <Properties>
+          <string name="Name">BottomBar</string>
+          <UDim2 name="Size">
+            <XS>1</XS>
+            <XO>0</XO>
+            <YS>0</YS>
+            <YO>36</YO>
+          </UDim2>
+          <float name="BackgroundTransparency">1</float>
+          <int name="BorderSizePixel">0</int>
+          <int name="LayoutOrder">3</int>
+        </Properties>
+        <Item class="TextButton" referent="RBX00000000000000043">
+          <Properties>
+            <string name="Name">CloseButton</string>
+            <UDim2 name="Size">
+              <XS>0</XS>
+              <XO>100</XO>
+              <YS>1</YS>
+              <YO>0</YO>
+            </UDim2>
+            <UDim2 name="Position">
+              <XS>1</XS>
+              <XO>-100</XO>
+              <YS>0</YS>
+              <YO>0</YO>
+            </UDim2>
+            <Color3 name="BackgroundColor3">
+              <R>0.85</R>
+              <G>0.25</G>
+              <B>0.25</B>
+            </Color3>
+            <float name="BackgroundTransparency">0</float>
+            <int name="BorderSizePixel">0</int>
+            <string name="Text">Close</string>
+            <Color3 name="TextColor3">
+              <R>1</R>
+              <G>1</G>
+              <B>1</B>
+            </Color3>
+            <float name="TextSize">14</float>
+            <token name="Font">18</token>
+          </Properties>
+          <Item class="UICorner" referent="RBX00000000000000044">
+            <Properties>
+              <string name="Name">UICorner</string>
+              <UDim name="CornerRadius">
+                <S>0</S>
+                <O>6</O>
+              </UDim>
+            </Properties>
+          </Item>
+        </Item>
+      </Item>
+    </Item>
+  </Item>
+</roblox>

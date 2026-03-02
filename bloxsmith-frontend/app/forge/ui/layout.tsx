@@ -9,5 +9,5 @@ export default function ForgeLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="h-screen w-screen overflow-hidden">{children}</div>;
+  return <div className="flex-1 min-h-0 w-full overflow-hidden">{children}</div>;
 }

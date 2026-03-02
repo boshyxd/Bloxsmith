@@ -11,13 +11,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing code" }, { status: 400 });
   }
 
-  const session = getSession(code);
+  const session = await getSession(code);
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  touchSession(code);
-  const command = getPendingCommand(code);
+  await touchSession(code);
+  const command = await getPendingCommand(code);
 
   return NextResponse.json({ command });
 }

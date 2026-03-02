@@ -18,7 +18,6 @@ const logos: Logo[] = [
   { name: "Roblox", src: "/logos/roblox.svg" },
   { name: "Anthropic", src: "/logos/anthropic.svg" },
   { name: "OpenAI", src: "/logos/openai.svg" },
-  { name: "Suno", src: "/logos/suno.svg" },
 ];
 
 const LogoMarquee = ({ logos }: { logos: Logo[] }) => {
@@ -56,7 +55,7 @@ const LogoMarquee = ({ logos }: { logos: Logo[] }) => {
               <img
                 src={logo.src}
                 alt={logo.name}
-                className="max-h-8 w-auto object-contain dark:invert"
+                className="max-h-8 w-auto object-contain invert"
               />
             </div>
           ))}
@@ -75,15 +74,15 @@ const LogoMarquee = ({ logos }: { logos: Logo[] }) => {
               <img
                 src={logo.src}
                 alt={logo.name}
-                className="max-h-8 w-auto object-contain dark:invert"
+                className="max-h-8 w-auto object-contain invert"
               />
             </div>
           ))}
         </motion.div>
       </div>
 
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-white dark:from-neutral-950 to-transparent"></div>
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-white dark:from-neutral-950 to-transparent"></div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-background to-transparent"></div>
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-background to-transparent"></div>
     </div>
   );
 };
@@ -92,11 +91,11 @@ export function SocialProof7() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   return (
-    <section className="py-24 bg-white dark:bg-neutral-950 overflow-hidden">
+    <section className="py-12 bg-background overflow-hidden">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="relative w-full max-w-5xl mx-auto mb-20">
+        <div className="relative w-full max-w-5xl mx-auto mb-10">
           <div
-            className="relative rounded-2xl overflow-hidden shadow-2xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 aspect-video flex items-center justify-center group cursor-pointer"
+            className="relative rounded-none overflow-hidden bg-card border border-border aspect-video flex items-center justify-center group cursor-pointer"
             onClick={() => setIsPlaying(true)}
           >
             {isPlaying ? (
@@ -116,12 +115,12 @@ export function SocialProof7() {
               </video>
             ) : (
               <>
-                <div className="absolute inset-0 opacity-50 dark:opacity-20 pointer-events-none">
+                <div className="absolute inset-0 opacity-20 pointer-events-none">
                   <div className="w-full h-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
                 </div>
 
-                <div className="relative z-10 w-20 h-20 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
-                  <Play className="w-8 h-8 text-neutral-900 dark:text-white fill-current ml-1" />
+                <div className="relative z-10 w-20 h-20 bg-secondary rounded-none flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                  <Play className="w-8 h-8 text-foreground fill-current ml-1" />
                 </div>
 
                 <div className="absolute inset-0 bg-linear-to-t from-black/5 to-transparent pointer-events-none" />
@@ -131,7 +130,7 @@ export function SocialProof7() {
         </div>
 
         <div className="max-w-3xl mx-auto text-center mb-8">
-          <p className="text-lg font-medium text-neutral-500 dark:text-neutral-400">
+          <p className="text-lg font-medium text-muted-foreground">
             Powered by the AI providers you already trust
           </p>
         </div>

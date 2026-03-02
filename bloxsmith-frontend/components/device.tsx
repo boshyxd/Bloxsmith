@@ -254,10 +254,7 @@ const Device = React.forwardRef<HTMLDivElement, DeviceProps>(
               "bg-black transition-shadow duration-300",
             )}
             style={{
-              boxShadow:
-                isHovering || autoAnimate
-                  ? "0 30px 60px -12px rgba(0, 0, 0, 0.3), 0 18px 36px -18px rgba(0, 0, 0, 0.25)"
-                  : "0 0 2rem 1rem rgba(0, 0, 0, 0.1)",
+              boxShadow: "none",
             }}
           >
             {/* Screen Content */}

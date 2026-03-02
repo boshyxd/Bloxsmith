@@ -7,10 +7,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing code" }, { status: 400 });
   }
 
-  const session = getSession(code);
+  const session = await getSession(code);
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ connected: isConnected(code) });
+  return NextResponse.json({ connected: await isConnected(code) });
 }

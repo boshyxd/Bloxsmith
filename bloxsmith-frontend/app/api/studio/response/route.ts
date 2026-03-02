@@ -10,12 +10,12 @@ export async function POST(request: NextRequest) {
     error?: string;
   };
 
-  const session = getSession(code);
+  const session = await getSession(code);
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  setResponse(code, requestId, { requestId, data, error });
+  await setResponse(code, requestId, { requestId, data, error });
 
   return NextResponse.json({ success: true });
 }

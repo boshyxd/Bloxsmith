@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronDown, Menu, X } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useCredits } from "@/hooks/use-credits";
 
 interface DropdownItem {
   title: string;
@@ -21,11 +24,16 @@ interface NavItem {
 }
 
 export function Navigation7() {
+  const pathname = usePathname();
+  const { user } = useAuth();
+  const { balanceCents } = useCredits();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileExpandedItem, setMobileExpandedItem] = useState<string | null>(
     null,
   );
+
+  if (pathname.startsWith("/forge")) return null;
 
   const navItems: NavItem[] = [
     {
@@ -40,23 +48,10 @@ export function Navigation7() {
             href: "/forge/ui",
           },
           {
-            title: "Build Forge",
-            description:
-              "Generate 3D environments and maps pushed directly to Studio",
-            href: "#how-it-works",
-          },
-          {
-            title: "Sound Forge",
-            description:
-              "Generate game music and SFX via Suno integration",
-            badge: "SOON",
-            href: "#how-it-works",
-          },
-          {
             title: "Studio Plugin",
             description:
               "One-click import and auto-publish to Roblox Studio",
-            href: "#plugin",
+            href: "/plugin",
           },
         ],
       },
@@ -92,17 +87,17 @@ export function Navigation7() {
 
   return (
     <>
-      <nav className="w-full py-6 px-4 sm:px-6 lg:px-8 bg-transparent">
+      <nav className="w-full py-4 px-4 sm:px-6 lg:px-8 bg-transparent">
         <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between gap-8">
           {/* Left side: Logo + Nav Items */}
           <div className="flex items-center gap-2">
             {/* Logo */}
             <a
-              href="#"
-              className="flex items-center justify-center aspect-square h-10 bg-neutral-200 dark:bg-neutral-900 rounded-md hover:bg-neutral-300 dark:hover:bg-neutral-800 transition-colors"
+              href="/"
+              className="flex items-center justify-center aspect-square h-8 bg-secondary rounded-none hover:bg-accent transition-colors"
               aria-label="Home"
             >
-              <div className="h-4 w-4 rounded-full bg-neutral-900 dark:bg-white" />
+              <img src="/logos/bloxsmith-icon.svg" alt="Bloxsmith" className="h-5 w-5" />
             </a>
 
             {/* Nav Items */}
@@ -115,7 +110,7 @@ export function Navigation7() {
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
                   <button
-                    className="flex items-center gap-1.5 px-4 h-10 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-800 rounded-md transition-colors text-sm tracking-tight font-medium text-neutral-900 dark:text-neutral-100"
+                    className="flex items-center gap-1.5 px-3 h-8 bg-secondary hover:bg-accent rounded-none transition-colors text-sm tracking-tight font-medium text-foreground"
                     aria-expanded={activeDropdown === item.label}
                     aria-haspopup="true"
                   >
@@ -135,8 +130,8 @@ export function Navigation7() {
                         }}
                         className="absolute top-full left-0 pt-2 z-50"
                       >
-                        <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl py-2 min-w-[500px]">
-                          <div className="text-xs font-medium text-neutral-400 dark:text-neutral-500 tracking-wider my-4 px-4">
+                        <div className="bg-card rounded-none border border-border py-2 min-w-[500px]">
+                          <div className="text-xs font-medium text-muted-foreground tracking-wider my-4 px-4">
                             {item.dropdown.title}
                           </div>
                           <div className="grid grid-cols-2 gap-3 px-2">
@@ -151,19 +146,19 @@ export function Navigation7() {
                                   delay: idx * 0.03,
                                   ease: [0.4, 0, 0.2, 1],
                                 }}
-                                className="group p-3 rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                                className="group p-3 rounded-none hover:bg-accent transition-colors"
                               >
                                 <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="text-sm font-medium tracking-tight text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-950 dark:group-hover:text-white transition-colors">
+                                  <h3 className="text-sm font-medium tracking-tight text-foreground group-hover:text-white transition-colors">
                                     {dropdownItem.title}
                                   </h3>
                                   {dropdownItem.badge && (
-                                    <span className="text-[10px] font-semibold text-neutral-600 dark:text-neutral-400 bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
+                                    <span className="text-[10px] font-semibold text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-none">
                                       {dropdownItem.badge}
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                <p className="text-xs text-muted-foreground leading-relaxed">
                                   {dropdownItem.description}
                                 </p>
                               </motion.a>
@@ -181,20 +176,26 @@ export function Navigation7() {
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
             {/* Desktop Buttons */}
-            <a href="/auth" className="hidden md:block px-4 h-10 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-800 rounded-md text-sm font-medium tracking-tight text-neutral-900 dark:text-neutral-100 transition-colors leading-10">
-              Log in
-            </a>
+            {user ? (
+              <a href="/profile" className="hidden md:block px-3 h-8 bg-secondary hover:bg-accent rounded-none text-sm font-medium tracking-tight text-foreground transition-colors leading-8">
+                ${(balanceCents / 100).toFixed(2)} | Profile
+              </a>
+            ) : (
+              <a href="/auth" className="hidden md:block px-3 h-8 bg-secondary hover:bg-accent rounded-none text-sm font-medium tracking-tight text-foreground transition-colors leading-8">
+                Log in
+              </a>
+            )}
             <a
               href="/forge/ui"
-              className="px-4 h-10 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-neutral-900 rounded-md text-sm font-medium tracking-tight transition-colors leading-10"
+              className="px-3 h-8 bg-foreground hover:bg-foreground/90 text-background rounded-none text-sm font-medium tracking-tight transition-colors leading-8"
             >
-              Start Free
+              {user ? "Open Forge" : "Start Free"}
             </a>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden px-4 h-10 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-800 rounded-md text-sm font-medium tracking-tight text-neutral-900 dark:text-neutral-100 transition-colors flex items-center gap-2"
+              className="md:hidden px-3 h-8 bg-secondary hover:bg-accent rounded-none text-sm font-medium tracking-tight text-foreground transition-colors flex items-center gap-2"
               aria-label="Open menu"
             >
               <Menu className="w-4 h-4" />
@@ -211,19 +212,19 @@ export function Navigation7() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 md:hidden"
+            className="fixed inset-0 z-50 bg-background md:hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between py-6 px-4">
-              <div className="flex items-center justify-center aspect-square h-10 bg-neutral-200 dark:bg-neutral-900 rounded-md">
-                <div className="h-4 w-4 rounded-full bg-neutral-900 dark:bg-white" />
+            <div className="flex items-center justify-between py-4 px-4">
+              <div className="flex items-center justify-center aspect-square h-8 bg-secondary rounded-none">
+                <img src="/logos/bloxsmith-icon.svg" alt="Bloxsmith" className="h-5 w-5" />
               </div>
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false);
                   setMobileExpandedItem(null);
                 }}
-                className="flex items-center gap-2 px-4 h-10 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-800 rounded-md text-sm font-medium text-neutral-900 dark:text-neutral-100 transition-colors"
+                className="flex items-center gap-2 px-3 h-8 bg-secondary hover:bg-accent rounded-none text-sm font-medium text-foreground transition-colors"
                 aria-label="Close menu"
               >
                 <X className="w-4 h-4" />
@@ -250,9 +251,9 @@ export function Navigation7() {
                           mobileExpandedItem === item.label ? null : item.label,
                         )
                       }
-                      className="w-full flex items-center justify-between px-4 py-3 bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md text-left transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-3 bg-secondary hover:bg-accent rounded-none text-left transition-colors"
                     >
-                      <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                      <span className="font-medium text-foreground">
                         {item.label}
                       </span>
                       <motion.div
@@ -261,7 +262,7 @@ export function Navigation7() {
                         }}
                         transition={{ duration: 0.2 }}
                       >
-                        <ChevronDown className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
+                        <ChevronDown className="w-5 h-5 text-muted-foreground" />
                       </motion.div>
                     </button>
 
@@ -290,19 +291,19 @@ export function Navigation7() {
                                   setIsMobileMenuOpen(false);
                                   setMobileExpandedItem(null);
                                 }}
-                                className="block p-3 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                                className="block p-3 rounded-none hover:bg-accent transition-colors"
                               >
                                 <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                                  <h3 className="text-sm font-medium text-foreground">
                                     {dropdownItem.title}
                                   </h3>
                                   {dropdownItem.badge && (
-                                    <span className="text-[10px] font-semibold text-neutral-600 dark:text-neutral-400 bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
+                                    <span className="text-[10px] font-semibold text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-none">
                                       {dropdownItem.badge}
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                <p className="text-xs text-muted-foreground leading-relaxed">
                                   {dropdownItem.description}
                                 </p>
                               </motion.a>
@@ -321,14 +322,20 @@ export function Navigation7() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.2 }}
-              className="fixed bottom-0 left-0 right-0 p-4 sm:p-6 space-y-3 bg-white dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800"
+              className="fixed bottom-0 left-0 right-0 p-4 sm:p-6 space-y-3 bg-background border-t border-border"
             >
-              <a href="/auth" className="w-full block px-4 py-3 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-800 rounded-md text-sm font-medium text-neutral-900 dark:text-neutral-100 transition-colors text-center">
-                Log in
+              {user ? (
+                <a href="/profile" className="w-full block px-4 py-3 bg-secondary hover:bg-accent rounded-none text-sm font-medium text-foreground transition-colors text-center">
+                  ${(balanceCents / 100).toFixed(2)} | Profile
+                </a>
+              ) : (
+                <a href="/auth" className="w-full block px-4 py-3 bg-secondary hover:bg-accent rounded-none text-sm font-medium text-foreground transition-colors text-center">
+                  Log in
+                </a>
+              )}
+              <a href="/forge/ui" className="w-full block px-4 py-3 bg-foreground hover:bg-foreground/90 text-background rounded-none text-sm font-medium transition-colors text-center">
+                {user ? "Open Forge" : "Start Free"}
               </a>
-              <button className="w-full px-4 py-3 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-neutral-900 rounded-md text-sm font-medium transition-colors">
-                Start Free
-              </button>
             </motion.div>
           </motion.div>
         )}

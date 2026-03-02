@@ -1,0 +1,55 @@
+Extract a style guide from this G2L (GUI to Luau) code. The format uses G2L["id"] variables, Instance.new() calls, and comment paths showing the hierarchy (e.g. -- StarterGui.HUD.MainShop...).
+
+Output a JSON object with EXACTLY these keys in this order. Do NOT rename keys, do NOT add extra top-level keys, do NOT omit keys. If a section has no data (e.g. no gradients found), use an empty array [].
+
+1. "name" — a short descriptive name for this style (2-3 words, e.g. "Simulator Vibrant", "Tycoon Clean", "RPG Fantasy").
+
+2. "architecture" — the structural blueprint of the UI. Use EXACTLY these sub-keys:
+   - "summary": 2-3 sentences on the fundamental approach (image-driven vs programmatic, how elements are composed).
+   - "panelStructure": object with exact Size, Position, AnchorPoint, BackgroundTransparency, BackgroundColor3, ClipsDescendants, aspectRatio ({value, type, dominantAxis}), uiStroke ({thickness, color, mode}). Omit fields that don't exist on the root panel.
+   - "header": object describing the header. Include class (ImageLabel or Frame), image asset if any, exact Size, Position, BackgroundTransparency, aspectRatio if present, and a "children" object with icon/title/closeButton sub-objects (each with class, size, position, and relevant properties).
+   - "contentArea": object with "insiderFrame" (class, size, position, anchorPoint, backgroundTransparency, clipsDescendants) and "scrollingFrame" (size, position, backgroundTransparency, canvasSize, aspectRatio if present, hasUIListLayout, hasUIPadding).
+   - "sectionPattern": object with "titleLabel" (size, font, textScaled, textColor3, uiStroke thickness) and "holderFrame" (string describing layout method — manual grid positions or UIListLayout, with exact grid coordinates if manual).
+   - "cardTypes": array of objects. Each card type found in the UI gets one entry with: "name" (string, e.g. "gamepassCard", "moneyCard", "inventorySlot"), "class", "size", "backgroundTransparency", "clipsDescendants", and "children" object listing child elements with their size/position/font/uiStroke. Use consistent child key names: "title", "description", "icon", "purchase", "purchaseIcon", "purchasePrice", "clippedZone", "sunRays". Omit children that don't exist on that card type.
+   - "buttonPattern": object (NOT a string) with "class", "backgroundTransparency", "scaleType", "hasUIScale", and "children" describing the standard button layout (icon position/size, price label position/size/font/uiStroke).
+   - "dialogPattern": object describing confirmation/prompt dialogs if present. Include panelSize, backdrop, background texture, header layout, content layout, and accept/decline button assets. If no dialogs exist in the source, set to null.
+   IMPORTANT: Include ALL UIAspectRatioConstraint values you find — AspectRatio number, AspectType, DominantAxis. These are critical for layout correctness.
+   IMPORTANT: Note whether items inside holder Frames use UIListLayout or manual Position values. If manual, include the grid positions.
+
+3. "colorPalette" — every unique Color3.fromRGB grouped into EXACTLY these sub-keys:
+   - "backgrounds": array of {hex, rgb, note}. Frame/container fills, overlay colors. Note transparency usage.
+   - "text": array of {hex, rgb, note}. All text colors grouped by purpose (standard, currency, warnings, highlights, actions).
+   - "accents": array of {hex, rgb, note}. Button tints, bar fills, glow colors, interactive element colors.
+   - "borders": array of {hex, rgb, note}. UIStroke colors, border colors.
+
+4. "gradients" — array of objects, one per UIGradient found via ColorSequence.new{...}. Each has: "element" (what it's on), "purpose", "rotation", "keypoints" (array of {time, rgb}). If none found, use [].
+
+5. "images" — every rbxassetid:// ID, grouped into EXACTLY these sub-keys:
+   - "headers": array of {id, purpose}.
+   - "cards": array of {id, purpose}. Note which card type each belongs to.
+   - "buttons": array of {id, purpose}. Note button type.
+   - "icons": array of {id, purpose}.
+   - "decorative": array of {id, purpose, imageTransparency?, imageColor3?, scaleType?}. Include optional properties only when set.
+
+6. "fonts" — array of objects. Each has: "family" (full rbxasset:// path), "weights" (array of weight/style strings), "note" (usage context).
+
+7. "strokes" — array of objects. Each has: "thickness" (number), "color" (RGB string), "use" (what elements use this thickness).
+
+8. "designLanguage" — 2-3 sentences describing the overall visual approach and what makes it distinct.
+
+9. "layoutRules" — object with these sub-keys describing hard layout rules observed in the source UI:
+   - "headerIconTitle": how icon and title are positioned relative to each other (e.g. title must clear icon bounds).
+   - "cardGridSpacing": how much gap between cards in grid layouts.
+   - "primaryActionVisibility": whether primary action buttons must be visible without scrolling.
+   - "buttonPadding": how buttons sit within content flow.
+   - "disabledStateColors": how claimed/completed/disabled states are colored (if observable, otherwise describe the palette's muted options).
+
+CRITICAL: The "architecture" section is the most important part. Without exact AspectRatio values, sizes, positions, and structural patterns, generated UI will look completely wrong. Be precise with numbers.
+
+CRITICAL: "cardTypes" must be an array, not separate named keys. This ensures consistent parsing regardless of how many card types the source UI has.
+
+Output ONLY the JSON, no commentary.
+
+---
+
+<paste G2L code here>

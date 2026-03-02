@@ -47,19 +47,19 @@ const SvgChart = () => {
 
 export default function Stats8() {
   return (
-    <section className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-neutral-950">
+    <section className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-[1400px] mx-auto w-full relative">
         {/* Header Section - Centered */}
-        <div className="flex flex-col items-center text-center mb-12 sm:mb-16 lg:mb-20">
+        <div className="flex flex-col items-center text-center mb-12 sm:mb-14">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-neutral-900 dark:text-white leading-tight mb-4 sm:mb-6"
+            className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-foreground leading-tight mb-4 sm:mb-6"
           >
             Built on{" "}
-            <span className="text-forge dark:text-forge">
+            <span className="text-forge">
               proven infrastructure
             </span>
           </motion.h2>
@@ -69,7 +69,7 @@ export default function Stats8() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-lg"
+            className="text-base sm:text-lg text-muted-foreground max-w-lg"
           >
             Bloxsmith is powered by the open-source robloxstudio-mcp server
             trusted by thousands of Roblox developers.
@@ -77,7 +77,7 @@ export default function Stats8() {
         </div>
 
         {/* Stats Grid - 2 Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 mb-12 sm:mb-16 lg:mb-20 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 mb-12 sm:mb-14 relative z-10">
           {statsData.map((stat, index) => (
             <motion.div
               key={index}
@@ -87,10 +87,10 @@ export default function Stats8() {
               transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
               className="flex flex-col items-center relative"
             >
-              <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight font-medium text-neutral-900 dark:text-white mb-2">
+              <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight font-medium text-foreground mb-2">
                 {stat.value}
               </div>
-              <p className="text-base text-forge dark:text-forge font-medium">
+              <p className="text-base text-forge font-medium">
                 {stat.description}
               </p>
             </motion.div>
@@ -103,7 +103,7 @@ export default function Stats8() {
           whileInView={{ opacity: 0.2, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="w-[1000px] sm:w-screen overflow-hidden scale-150 absolute z-0 -bottom-12 sm:-bottom-32 invert dark:filter-none"
+          className="w-[1000px] sm:w-screen overflow-hidden scale-150 absolute z-0 -bottom-12 sm:-bottom-32 filter-none"
         >
           <SvgChart />
         </motion.div>

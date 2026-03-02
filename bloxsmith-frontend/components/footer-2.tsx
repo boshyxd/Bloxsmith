@@ -39,7 +39,7 @@ export default function Footer2() {
         <div className="h-32 sm:h-40 md:h-48" />
 
         {/* Black Container with Content */}
-        <div className="relative bg-white dark:bg-neutral-950">
+        <div className="relative bg-background">
           {/* Left Corner SVG */}
           <div className="absolute left-0 top-0 z-10 -translate-y-full">
             <svg
@@ -52,7 +52,7 @@ export default function Footer2() {
             >
               <path
                 d="M0 0H451.601C467.78 0 483.071 7.75893 491.954 21.2815C558.518 122.612 538.359 153.074 614 153H0V0Z"
-                className="fill-white dark:fill-neutral-950"
+                className="fill-background"
               />
             </svg>
           </div>
@@ -69,26 +69,28 @@ export default function Footer2() {
             >
               <path
                 d="M0 0H451.601C467.78 0 483.071 7.75893 491.954 21.2815C558.518 122.612 538.359 153.074 614 153H0V0Z"
-                className="fill-white dark:fill-neutral-950"
+                className="fill-background"
               />
             </svg>
           </div>
 
           {/* Footer Content */}
-          <div className="mx-auto w-full max-w-[1400px] px-4 lg:px-8 py-12">
+          <div className="mx-auto w-full max-w-[1400px] px-4 lg:px-8 py-10">
             <motion.div
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              className="flex flex-col items-center space-y-8 sm:space-y-10 md:space-y-12"
+              className="flex flex-col items-center space-y-8 sm:space-y-10"
             >
               {/* Logo */}
-              <motion.div variants={itemVariants} className="text-center">
-                <h2 className="text-4xl font-bold text-neutral-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
-                  Bloxsmith
-                </h2>
-                <p className="mt-2 text-xl font-medium text-neutral-900 dark:text-white sm:text-2xl md:text-3xl">
+              <motion.div variants={itemVariants} className="flex flex-col items-center">
+                <img
+                  src="/logos/bloxsmith-wordmark.svg"
+                  alt="Bloxsmith"
+                  className="h-10 sm:h-14 md:h-16 lg:h-20 w-auto"
+                />
+                <p className="mt-3 text-xl font-medium text-foreground sm:text-2xl md:text-3xl">
                   forge your vision
                 </p>
               </motion.div>
@@ -96,29 +98,29 @@ export default function Footer2() {
               {/* Links */}
               <motion.div
                 variants={itemVariants}
-                className="flex flex-wrap items-center justify-center gap-3 text-sm text-neutral-900 dark:text-white sm:gap-4 sm:text-base"
+                className="flex flex-wrap items-center justify-center gap-3 text-sm text-foreground sm:gap-4 sm:text-base"
               >
                 <a
                   href="#pricing"
-                  className="transition-colors hover:text-neutral-600 dark:hover:text-neutral-300"
+                  className="transition-colors hover:text-muted-foreground"
                 >
                   PRICING
                 </a>
-                <span className="text-neutral-400 dark:text-neutral-500">
+                <span className="text-muted-foreground">
                   -
                 </span>
                 <a
                   href="#"
-                  className="transition-colors hover:text-neutral-600 dark:hover:text-neutral-300"
+                  className="transition-colors hover:text-muted-foreground"
                 >
                   DISCORD
                 </a>
-                <span className="text-neutral-400 dark:text-neutral-500">
+                <span className="text-muted-foreground">
                   -
                 </span>
                 <a
                   href="https://github.com/anthropics/robloxstudio-mcp"
-                  className="transition-colors hover:text-neutral-600 dark:hover:text-neutral-300"
+                  className="transition-colors hover:text-muted-foreground"
                 >
                   GITHUB
                 </a>
@@ -131,14 +133,14 @@ export default function Footer2() {
               >
                 <a
                   href="#"
-                  className="text-neutral-900 transition-colors hover:text-neutral-600 dark:text-white dark:hover:text-neutral-300"
+                  className="text-foreground transition-colors hover:text-muted-foreground"
                   aria-label="Instagram"
                 >
                   <Instagram className="h-6 w-6 sm:h-7 sm:w-7" />
                 </a>
                 <a
                   href="#"
-                  className="text-neutral-900 transition-colors hover:text-neutral-600 dark:text-white dark:hover:text-neutral-300"
+                  className="text-foreground transition-colors hover:text-muted-foreground"
                   aria-label="Twitter"
                 >
                   <svg
@@ -151,7 +153,7 @@ export default function Footer2() {
                 </a>
                 <a
                   href="#"
-                  className="text-neutral-900 transition-colors hover:text-neutral-600 dark:text-white dark:hover:text-neutral-300"
+                  className="text-foreground transition-colors hover:text-muted-foreground"
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="h-6 w-6 sm:h-7 sm:w-7" />
@@ -161,17 +163,17 @@ export default function Footer2() {
               {/* Bottom Section */}
               <motion.div
                 variants={itemVariants}
-                className="flex w-full flex-col items-center justify-between gap-6 border-t border-neutral-200 dark:border-neutral-800 pt-8 text-center sm:flex-row sm:text-left md:pt-10"
+                className="flex w-full flex-col items-center justify-between gap-6 border-t border-border pt-8 text-center sm:flex-row sm:text-left"
               >
                 {/* Copyright */}
-                <div className="text-xs text-neutral-600 dark:text-neutral-400 sm:text-sm">
-                  <p>© 2026 Bloxsmith. All rights reserved.</p>
+                <div className="text-xs text-muted-foreground sm:text-sm">
+                  <p>&copy; 2026 Bloxsmith. All rights reserved.</p>
                 </div>
 
                 {/* Right text */}
-                <div className="text-xs text-neutral-600 dark:text-neutral-400 sm:text-right sm:text-sm">
-                  <p>UI FORGE / BUILD FORGE / SOUND FORGE</p>
-                  <p>POWERED BY BYOK AI</p>
+                <div className="text-xs text-muted-foreground sm:text-right sm:text-sm">
+                  <p>UI FORGE</p>
+                  <p>POWERED BY AI</p>
                 </div>
               </motion.div>
             </motion.div>

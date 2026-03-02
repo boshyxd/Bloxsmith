@@ -1,5 +1,8 @@
 "use client";
 
+import type { SerializedInstance } from "@/lib/studio/types";
+import { RobloxRenderer } from "./roblox-renderer";
+
 const GRID_BG = `repeating-linear-gradient(
     0deg,
     transparent,
@@ -15,18 +18,15 @@ const GRID_BG = `repeating-linear-gradient(
     var(--grid-line) 20px
   )`;
 
-export function CanvasViewport() {
+export function CanvasViewport({ trees }: { trees: SerializedInstance[] }) {
   return (
     <div
-      className="relative bg-neutral-100 dark:bg-neutral-900 overflow-hidden [--grid-line:theme(colors.neutral.200)] dark:[--grid-line:theme(colors.neutral.800)]"
+      className="relative bg-secondary overflow-hidden [--grid-line:oklch(1_0_0/4%)]"
       style={{ backgroundImage: GRID_BG }}
     >
-      {/* Centered device frame */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative w-[375px] h-[667px] rounded-md border-2 border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 shadow-lg flex items-center justify-center">
-          <span className="text-xs text-neutral-300 dark:text-neutral-600">
-            Canvas
-          </span>
+        <div className="relative w-[375px] h-[667px] rounded-none border-2 border-border bg-background overflow-hidden">
+          <RobloxRenderer trees={trees} />
         </div>
       </div>
     </div>

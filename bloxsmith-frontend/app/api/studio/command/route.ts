@@ -9,13 +9,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing code or requestId" }, { status: 400 });
   }
 
-  const session = getSession(code);
+  const session = await getSession(code);
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  const response = getResponse(code, requestId);
-  return NextResponse.json({ response: response?.data ?? null });
+  const response = await getResponse(code, requestId);
+  if (!response) {
+    return NextResponse.json({ response: null });
+  }
+  return NextResponse.json({
+    response: response.data ?? null,
+    error: response.error ?? null,
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -26,14 +32,14 @@ export async function POST(request: NextRequest) {
     data: Record<string, unknown>;
   };
 
-  const session = getSession(code);
+  const session = await getSession(code);
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
   const requestId = crypto.randomUUID();
 
-  addCommand(code, {
+  await addCommand(code, {
     id: requestId,
     type,
     data,

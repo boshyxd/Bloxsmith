@@ -23,7 +23,7 @@ const items = [
     id: 2,
     title: "Describe what you want",
     description:
-      "Tell Bloxsmith what to build in plain English. Your AI key generates UIs, environments, or audio matched to your chosen style.",
+      "Tell Bloxsmith what to build in plain English. Your AI generates UIs matched to your chosen style.",
     images: [
       "https://images.unsplash.com/photo-1677442135136-760c813028c4?q=80&w=400&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1675271591211-930ce12df0e6?q=80&w=400&auto=format&fit=crop",
@@ -56,22 +56,22 @@ export function HowItWorks3() {
   return (
     <section
       id="how-it-works"
-      className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-neutral-950"
+      className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-background"
       aria-label="How it works"
     >
-      <div className="max-w-[1400px] mx-auto w-full">
+      <div className="max-w-5xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-neutral-900 dark:text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-foreground mb-6">
               Ship in days,{" "}
               <span className="italic font-serif">not months.</span>
             </h2>
 
-            <div className="relative border-l-2 border-dashed border-neutral-200 dark:border-neutral-800">
+            <div className="relative border-l-2 border-dashed border-border">
               {items.map((item) => (
                 <div
                   key={item.id}
@@ -79,7 +79,7 @@ export function HowItWorks3() {
                   onClick={() => setActiveItem(item.id)}
                 >
                   <motion.div
-                    className="absolute left-0 top-0 bottom-0 w-0.5 -ml-px bg-neutral-900 dark:bg-white"
+                    className="absolute left-0 top-0 bottom-0 w-0.5 -ml-px bg-foreground"
                     initial={false}
                     animate={{
                       opacity: activeItem === item.id ? 1 : 0,
@@ -96,8 +96,8 @@ export function HowItWorks3() {
                   >
                     <h3
                       className={`text-base sm:text-lg font-medium transition-colors duration-200 ${activeItem === item.id
-                        ? "text-neutral-900 dark:text-white"
-                        : "text-neutral-400 dark:text-neutral-600"
+                        ? "text-foreground"
+                        : "text-muted-foreground"
                         }`}
                     >
                       {item.title}
@@ -112,7 +112,7 @@ export function HowItWorks3() {
                       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="text-sm sm:text-base text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-md">
+                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-md">
                         {item.description}
                       </p>
                     </motion.div>
@@ -130,14 +130,12 @@ export function HowItWorks3() {
             style={{ perspective: "600px" }}
           >
             <div
-              className="relative rounded-2xl p-4 sm:p-5 max-w-sm w-full border border-neutral-200/50 dark:border-neutral-700/50 bg-linear-to-br from-pink-50/80 via-blue-50/80 to-green-50/80 dark:from-neutral-800/80 dark:via-neutral-900/80 dark:to-neutral-800/80"
+              className="relative rounded-none p-4 sm:p-5 max-w-sm w-full border border-border bg-card"
               style={{
                 transform: "rotateY(-20deg) rotateX(8deg)",
                 transformStyle: "preserve-3d",
               }}
             >
-              <div className="absolute inset-0 rounded-2xl bg-white/40 dark:bg-neutral-900/60 backdrop-blur-sm" />
-
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeItem}
@@ -153,7 +151,7 @@ export function HowItWorks3() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: idx * 0.05 }}
-                      className="overflow-hidden rounded-xl shadow-lg aspect-square"
+                      className="overflow-hidden rounded-none aspect-square"
                     >
                       <img
                         src={image}
@@ -170,7 +168,7 @@ export function HowItWorks3() {
                 {[Sparkles, Wand2, Layers, Download].map((Icon, idx) => (
                   <div
                     key={idx}
-                    className="w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-md flex items-center justify-center text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
+                    className="w-10 h-10 rounded-none bg-secondary flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors cursor-pointer"
                   >
                     <Icon className="w-4 h-4" />
                   </div>

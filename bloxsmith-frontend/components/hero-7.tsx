@@ -5,7 +5,7 @@ import { useTexture } from "@react-three/drei";
 import { useMemo, useRef, Suspense, useEffect } from "react";
 import * as THREE from "three";
 import { motion } from "motion/react";
-import { ArrowRight, Github, Zap } from "lucide-react";
+import { ArrowRight, Github } from "lucide-react";
 import Image from "next/image";
 
 const carouselVertexShader = `
@@ -21,56 +21,12 @@ const carouselVertexShader = `
 `;
 
 const carouselFragmentShader = `
-  uniform sampler2D uTexture;
-  uniform vec2 uResolution;
+  uniform sampler2D uTextureBefore;
+  uniform sampler2D uTextureAfter;
   uniform float uBarWidth;
 
   varying vec2 vUv;
   varying vec3 vWorldPosition;
-
-  float bayerDither(vec2 position) {
-    int x = int(mod(position.x, 8.0));
-    int y = int(mod(position.y, 8.0));
-
-    int index = x + y * 8;
-    float threshold = 0.0;
-
-    if (index == 0) threshold = 0.0/64.0;
-    else if (index == 1) threshold = 32.0/64.0;
-    else if (index == 2) threshold = 8.0/64.0;
-    else if (index == 3) threshold = 40.0/64.0;
-    else if (index == 4) threshold = 2.0/64.0;
-    else if (index == 5) threshold = 34.0/64.0;
-    else if (index == 6) threshold = 10.0/64.0;
-    else if (index == 7) threshold = 42.0/64.0;
-    else if (index == 8) threshold = 48.0/64.0;
-    else if (index == 9) threshold = 16.0/64.0;
-    else if (index == 10) threshold = 56.0/64.0;
-    else if (index == 11) threshold = 24.0/64.0;
-    else if (index == 12) threshold = 50.0/64.0;
-    else if (index == 13) threshold = 18.0/64.0;
-    else if (index == 14) threshold = 58.0/64.0;
-    else if (index == 15) threshold = 26.0/64.0;
-    else if (index == 16) threshold = 12.0/64.0;
-    else if (index == 17) threshold = 44.0/64.0;
-    else if (index == 18) threshold = 4.0/64.0;
-    else if (index == 19) threshold = 36.0/64.0;
-    else if (index == 20) threshold = 14.0/64.0;
-    else if (index == 21) threshold = 46.0/64.0;
-    else if (index == 22) threshold = 6.0/64.0;
-    else if (index == 23) threshold = 38.0/64.0;
-    else if (index == 24) threshold = 60.0/64.0;
-    else if (index == 25) threshold = 28.0/64.0;
-    else if (index == 26) threshold = 52.0/64.0;
-    else if (index == 27) threshold = 20.0/64.0;
-    else if (index == 28) threshold = 62.0/64.0;
-    else if (index == 29) threshold = 30.0/64.0;
-    else if (index == 30) threshold = 54.0/64.0;
-    else if (index == 31) threshold = 22.0/64.0;
-    else threshold = mod(float(index) * 0.125, 1.0);
-
-    return threshold;
-  }
 
   float roundedRectSDF(vec2 p, vec2 b, float r) {
     vec2 d = abs(p) - b + vec2(r);
@@ -78,28 +34,20 @@ const carouselFragmentShader = `
   }
 
   void main() {
-    vec4 texColor = texture2D(uTexture, vUv);
+    vec4 beforeColor = texture2D(uTextureBefore, vUv);
+    vec4 afterColor = texture2D(uTextureAfter, vUv);
 
     float barTransition = smoothstep(-uBarWidth, uBarWidth, vWorldPosition.x);
 
-    float gray = dot(texColor.rgb, vec3(0.299, 0.587, 0.114));
-    vec3 grayscaleColor = vec3(gray);
-
-    vec2 pixelPos = vUv * uResolution;
-    float ditherThreshold = bayerDither(pixelPos);
-
-    float levels = 4.0;
-    float quantized = floor(gray * levels + ditherThreshold) / levels;
-    vec3 ditheredGray = vec3(quantized);
-
-    vec3 finalColor = mix(ditheredGray, texColor.rgb, barTransition);
+    vec3 finalColor = mix(beforeColor.rgb, afterColor.rgb, barTransition);
+    float finalAlpha = mix(beforeColor.a, afterColor.a, barTransition);
 
     vec2 centeredUv = vUv * 2.0 - 1.0;
     float cornerRadius = 0.1;
     float dist = roundedRectSDF(centeredUv, vec2(1.0, 1.0), cornerRadius);
     float alpha = 1.0 - smoothstep(-0.02, 0.02, dist);
 
-    gl_FragColor = vec4(finalColor, alpha * texColor.a);
+    gl_FragColor = vec4(finalColor, alpha * finalAlpha);
   }
 `;
 
@@ -129,7 +77,7 @@ const glowFragmentShader = `
     float scanLine = sin(vUv.y * 60.0 + uTime * 2.0) * 0.02 + 0.98;
     glow *= scanLine;
 
-    vec3 glowColor = vec3(1.0, 0.65, 0.2);
+    vec3 glowColor = vec3(1.0, 1.0, 1.0);
 
     float edgeDist = abs(vUv.y - 0.5) * 2.0;
     float vertFade = 1.0 - smoothstep(0.2, 0.95, edgeDist);
@@ -139,20 +87,19 @@ const glowFragmentShader = `
   }
 `;
 
-const CAROUSEL_IMAGES = [
-  "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
-  "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
-  "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
-  "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80",
-  "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80",
-  "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
-  "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
-  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
-  "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
+const CAROUSEL_PAIRS = [
+  { before: "/hero/unstyled-shop.png", after: "/hero/styled-shop.png" },
+  { before: "/hero/unstyled-settings.png", after: "/hero/styled-settings.png" },
+  { before: "/hero/unstyled-leaderboard.png", after: "/hero/styled-leaderboard.png" },
+  { before: "/hero/unstyled-inventory.png", after: "/hero/styled-inventory.png" },
+  { before: "/hero/unstyled-notifications.png", after: "/hero/styled-notifications.png" },
+  { before: "/hero/unstyled-profile.png", after: "/hero/styled-profile.png" },
+  { before: "/hero/unstyled-daily-rewards.png", after: "/hero/styled-daily-rewards.png" },
 ];
 
 interface CarouselItemProps {
-  texture: THREE.Texture;
+  beforeTexture: THREE.Texture;
+  afterTexture: THREE.Texture;
   index: number;
   totalItems: number;
   rotationRef: React.RefObject<number>;
@@ -160,7 +107,8 @@ interface CarouselItemProps {
 }
 
 function CarouselItem({
-  texture,
+  beforeTexture,
+  afterTexture,
   index,
   totalItems,
   rotationRef,
@@ -171,11 +119,11 @@ function CarouselItem({
 
   const uniforms = useMemo(
     () => ({
-      uTexture: { value: texture },
-      uResolution: { value: new THREE.Vector2(400, 300) },
+      uTextureBefore: { value: beforeTexture },
+      uTextureAfter: { value: afterTexture },
       uBarWidth: { value: 0.1 },
     }),
-    [texture],
+    [beforeTexture, afterTexture],
   );
 
   useFrame(() => {
@@ -265,7 +213,7 @@ function GlowParticles() {
   const shaderMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
-        uColor: { value: new THREE.Color("#F59E0B") },
+        uColor: { value: new THREE.Color("#FFFFFF") },
         uFadeDistance: { value: fadeDistance },
       },
       vertexShader: `
@@ -441,7 +389,10 @@ function ResizeHandler() {
 }
 
 function CarouselScene() {
-  const textures = useTexture(CAROUSEL_IMAGES);
+  const beforePaths = CAROUSEL_PAIRS.map((p) => p.before);
+  const afterPaths = CAROUSEL_PAIRS.map((p) => p.after);
+  const beforeTextures = useTexture(beforePaths);
+  const afterTextures = useTexture(afterPaths);
   const rotationRef = useRef(0);
   const radius = 4.5;
 
@@ -451,12 +402,13 @@ function CarouselScene() {
 
   return (
     <group>
-      {textures.map((texture, index) => (
+      {CAROUSEL_PAIRS.map((_, index) => (
         <CarouselItem
           key={index}
-          texture={texture}
+          beforeTexture={beforeTextures[index]}
+          afterTexture={afterTextures[index]}
           index={index}
-          totalItems={textures.length}
+          totalItems={CAROUSEL_PAIRS.length}
           rotationRef={rotationRef}
           radius={radius}
         />
@@ -485,27 +437,39 @@ function LoadingFallback() {
 
 export function Hero7() {
   return (
-    <section className="relative w-full min-h-screen bg-white dark:bg-neutral-950 overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 z-20 flex flex-col items-start sm:items-center text-left sm:text-center pt-12 sm:pt-16 md:pt-20 px-4">
-        {/* Badge */}
+    <section className="relative w-full min-h-screen bg-background overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 z-20 flex flex-col items-start sm:items-center text-left sm:text-center pt-10 sm:pt-12 md:pt-14 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.8, delay: 0, ease: [0.25, 0.1, 0.25, 1] }}
+          className="mb-0"
+        >
+          <img
+            src="/logos/bloxsmith-wordmark.svg"
+            alt="Bloxsmith"
+            className="h-8 sm:h-10 md:h-12 w-auto"
+          />
+        </motion.div>
+
         <motion.a
-          href="https://github.com/anthropics/robloxstudio-mcp"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0 }}
-          className="mb-5 sm:mb-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10 text-xs sm:text-sm text-amber-700 dark:text-amber-400 font-medium hover:bg-amber-500/10 dark:hover:bg-amber-500/20 transition-colors cursor-pointer"
+          href="https://github.com/boshyxd/robloxstudio-mcp"
+          initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+          className="mt-4 sm:mt-5 mb-5 sm:mb-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-none border border-foreground/30 bg-foreground/10 text-xs sm:text-sm text-foreground/80 font-medium hover:bg-foreground/20 transition-colors cursor-pointer"
         >
           <Github className="w-3.5 h-3.5" />
           From the makers of robloxstudio-mcp
-          <span className="text-amber-500/60">|</span>
+          <span className="text-foreground/40">|</span>
           <span className="font-bold">10K+ installs</span>
         </motion.a>
 
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium text-neutral-900 dark:text-white tracking-tight leading-[1.1] max-w-4xl"
+          initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-medium text-foreground tracking-tight leading-[1.1] max-w-4xl"
         >
           The AI Forge for
           <br />
@@ -515,54 +479,36 @@ export function Hero7() {
               alt="Roblox"
               width={240}
               height={44}
-              className="inline h-[0.75em] w-auto translate-y-[0.03em] dark:invert"
+              className="inline h-[0.75em] w-auto translate-y-[0.03em] invert"
             />
             Developers
           </span>
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl leading-relaxed"
+          initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+          className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-foreground/70 max-w-2xl leading-relaxed"
         >
-          Generate production-ready UIs, 3D environments, and game audio
-          with curated style presets.
+          Generate <span className="text-foreground font-medium">production-ready</span> Roblox UIs
+          with <span className="text-foreground font-medium">curated styles</span>.
           <br className="hidden sm:block" />
-          Bring your own AI key. No credits. No token anxiety.
+          Pay only for what you use. Simple per-generation pricing.
         </motion.p>
-
-        {/* Tool pills */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          className="mt-4 sm:mt-5 flex flex-wrap justify-start sm:justify-center gap-2"
-        >
-          {["UI Forge", "Build Forge", "Sound Forge"].map((tool) => (
-            <span
-              key={tool}
-              className="px-3 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700/50 text-xs font-medium text-neutral-600 dark:text-neutral-400"
-            >
-              <Zap className="w-3 h-3 inline mr-1 text-amber-500" />
-              {tool}
-            </span>
-          ))}
-        </motion.div>
 
         {/* CTAs */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto"
         >
           <motion.a
             href="/forge/ui"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 bg-neutral-900 dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-neutral-900 rounded-full text-sm sm:text-base font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="px-6 py-3 bg-foreground hover:bg-foreground/90 text-background rounded-none text-sm sm:text-base font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             Start Building Free
             <ArrowRight className="w-4 h-4" />
@@ -571,14 +517,14 @@ export function Hero7() {
             href="#how-it-works"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-300 dark:border-neutral-700 rounded-full text-neutral-900 dark:text-white text-sm sm:text-base font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="px-6 py-3 bg-secondary hover:bg-accent border border-border rounded-none text-foreground text-sm sm:text-base font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             See How It Works
           </motion.a>
         </motion.div>
       </div>
 
-      <div className="absolute inset-0 z-10 translate-y-[180px] sm:translate-y-[220px] xl:translate-y-[200px]">
+      <div className="absolute inset-0 z-10 translate-y-[140px] sm:translate-y-[180px] xl:translate-y-[160px]">
         <Canvas
           camera={{ position: [0, 0, 8], fov: 45 }}
           dpr={[1, 2]}

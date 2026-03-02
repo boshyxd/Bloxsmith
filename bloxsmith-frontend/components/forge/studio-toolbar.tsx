@@ -3,31 +3,30 @@
 interface StudioToolbarProps {
   connectionSlot?: React.ReactNode;
   styleSlot?: React.ReactNode;
+  creditsSlot?: React.ReactNode;
 }
 
-export function StudioToolbar({ connectionSlot, styleSlot }: StudioToolbarProps) {
+export function StudioToolbar({ connectionSlot, styleSlot, creditsSlot }: StudioToolbarProps) {
   return (
-    <div className="col-span-3 h-12 flex items-center justify-between px-3 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
-      {/* Left: logo + breadcrumb */}
+    <div className="col-span-3 h-12 flex items-center justify-between px-3 border-b border-border bg-background">
       <div className="flex items-center gap-3">
         <a
           href="/"
-          className="flex items-center justify-center h-7 w-7 rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold"
+          className="flex items-center justify-center h-7 w-7 rounded-none bg-secondary"
           aria-label="Home"
         >
-          B
+          <img src="/logos/bloxsmith-icon.svg" alt="Bloxsmith" className="h-4 w-4" />
         </a>
-        <span className="text-xs text-neutral-400 dark:text-neutral-500">/</span>
-        <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100">
-          UI Forge
-        </span>
+        <span className="text-xs text-muted-foreground">/</span>
+        <span className="text-xs font-medium text-foreground">UI Forge</span>
       </div>
 
-      {/* Center: style picker slot */}
       <div>{styleSlot}</div>
 
-      {/* Right: connection status slot */}
-      <div>{connectionSlot}</div>
+      <div className="flex items-center gap-3">
+        {creditsSlot}
+        {connectionSlot}
+      </div>
     </div>
   );
 }

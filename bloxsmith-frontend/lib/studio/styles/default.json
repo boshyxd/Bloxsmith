@@ -1,0 +1,223 @@
+{
+  "name": "Stud",
+  "architecture": {
+    "summary": "Image-driven UI. Headers, cards, and buttons use pre-rendered image assets with content overlaid. For non-card containers (list rows, inventory slots, stat boxes, notification bars), use dark Frames (Color3.fromRGB(23, 23, 23), BackgroundTransparency ~0.2) with UICorner and a tiled stud texture overlay — NOT stretched image assets. Every panel root also gets a dim stud texture background. Items inside holder Frames are manually positioned in a grid, NOT using UIListLayout. UIAspectRatioConstraint with exact values is critical on panels, headers, scrollframes, and holders.",
+    "panelStructure": {
+      "class": "Frame",
+      "size": "UDim2.new(0.38, 0, 0.6, 0)",
+      "position": "UDim2.new(0.5, 0, 0.491, 0)",
+      "anchorPoint": "Vector2.new(0.5, 0.5)",
+      "backgroundColor3": "Color3.fromRGB(0, 0, 0)",
+      "backgroundTransparency": 0.55,
+      "clipsDescendants": true,
+      "aspectRatio": { "value": 1.4627, "type": "ScaleWithParentSize", "dominantAxis": "Height" },
+      "uiStroke": { "thickness": 3, "color": "0, 0, 0", "mode": "Border" },
+      "studBackground": {
+        "IMPORTANT": "Every panel MUST have a dim stud texture as a background layer.",
+        "class": "ImageLabel",
+        "image": "rbxassetid://15910695828",
+        "size": "UDim2.new(1, 0, 1, 0)",
+        "backgroundTransparency": 1,
+        "imageTransparency": 0.7,
+        "scaleType": "Tile",
+        "tileSize": "UDim2.new(0, 40, 0, 40)",
+        "zIndex": 0
+      }
+    },
+    "header": {
+      "class": "ImageLabel (NOT Frame)",
+      "image": "rbxassetid://139872784959993",
+      "size": "UDim2.new(1.009, 0, 0.207, 0)",
+      "position": "UDim2.new(-0.006, 0, -0.027, 0)",
+      "backgroundTransparency": 1,
+      "aspectRatio": { "value": 7.1134, "type": "FitWithinMaxSize", "dominantAxis": "Width" },
+      "children": {
+        "icon": { "class": "ImageLabel", "image": "rbxassetid://99092746223643", "size": "UDim2.new(0.097, 0, 0.763, 0)", "position": "UDim2.new(0.012, 0, 0.111, 0)" },
+        "title": { "class": "TextLabel", "size": "UDim2.new(0.311, 0, 0.553, 0)", "position": "UDim2.new(0.12, 0, 0.199, 0)", "font": "FredokaOne Bold", "textScaled": true, "uiStroke": 3, "IMPORTANT": "Title X position must clear the icon (icon ends at ~0.109). Never overlap icon and title." },
+        "closeButton": { "class": "ImageButton", "image": "rbxassetid://124332107873691", "size": "UDim2.new(0.115, 0, 0.829, 0)", "position": "UDim2.new(0.879, 0, 0.077, 0)", "hasUIScale": true }
+      }
+    },
+    "contentArea": {
+      "insiderFrame": { "class": "CanvasGroup", "size": "UDim2.new(0.979, 0, 0.968, 0)", "position": "UDim2.new(0.5, 0, 0.5, 0)", "anchorPoint": "0.5, 0.5", "backgroundTransparency": 1, "clipsDescendants": true, "IMPORTANT": "BackgroundTransparency MUST be 1. The InsiderFrame is only used for clipping content via CanvasGroup — it must never show a visible background color." },
+      "scrollingFrame": { "size": "UDim2.new(1, 0, 0.83, 0)", "position": "UDim2.new(0, 0, 0.163, 0)", "backgroundTransparency": 1, "canvasSize": "UDim2.new(0, 0, 3, 0)", "aspectRatio": { "value": 1.7829, "type": "FitWithinMaxSize", "dominantAxis": "Width" }, "uiListLayout": { "Padding": "UDim.new(0, 0)", "FillDirection": "Vertical", "SortOrder": "LayoutOrder", "IMPORTANT": "Padding MUST be UDim.new(0, 0). Zero gap. Spacing between sections comes from the holder frame heights, not from layout padding." }, "uiPadding": { "PaddingTop": "UDim.new(0, 0)", "PaddingBottom": "UDim.new(0, 0)", "PaddingLeft": "UDim.new(0, 0)", "PaddingRight": "UDim.new(0, 0)", "IMPORTANT": "All padding values MUST be zero. Do NOT add scale-based padding." } }
+    },
+    "sectionPattern": {
+      "titleLabel": { "size": "UDim2.new(0.334, 0, 0.023, 0)", "font": "FredokaOne Bold", "textScaled": true, "textColor3": "255, 255, 255", "uiStroke": 2 },
+      "holderFrame": {
+        "class": "Frame",
+        "backgroundTransparency": 1,
+        "size": "UDim2.new(0.979, 0, 0.243, 0)",
+        "IMPORTANT_NO_ASPECT_RATIO": "Do NOT add UIAspectRatioConstraint to holder frames. The height is set explicitly via Size.",
+        "IMPORTANT_NO_UILISTLAYOUT": "Cards inside holder frames are MANUALLY POSITIONED, never use UIListLayout inside holders.",
+        "cardSize": "UDim2.new(0.531, 0, 0.548, 0)",
+        "cardPositions": {
+          "topLeft": "UDim2.new(-0.02, 0, 0, 0)",
+          "topRight": "UDim2.new(0.488, 0, 0, 0)",
+          "bottomLeft": "UDim2.new(-0.02, 0, 0.485, 0)",
+          "bottomRight": "UDim2.new(0.488, 0, 0.485, 0)"
+        },
+        "IMPORTANT_CARD_SIZING": "Cards are 0.531 wide and 0.548 tall (NOT 0.49). Left column at X=-0.02, right column at X=0.488. Top row at Y=0, bottom row at Y=0.485. These values create a tight edge-to-edge fit. Do NOT use 0.49x0.49 or round positions to 0.5 — that creates visible gaps."
+      }
+    },
+    "cardTypes": [
+      {
+        "name": "gamepassCard",
+        "class": "ImageLabel",
+        "size": "UDim2.new(0.531, 0, 0.548, 0)",
+        "backgroundTransparency": 1,
+        "clipsDescendants": true,
+        "children": {
+          "title": { "size": "UDim2.new(0.728, 0, 0.236, 0)", "position": "UDim2.new(0.144, 0, 0.075, 0)", "textColor3": "255, 255, 255", "font": "FredokaOne Bold", "uiStroke": 2 },
+          "description": { "size": "UDim2.new(0.417, 0, 0.306, 0)", "position": "UDim2.new(0.492, 0, 0.346, 0)", "textColor3": "47, 255, 158", "font": "FredokaOne Regular", "uiStroke": 1.4, "hasUITextSizeConstraint": true, "maxTextSize": 14 },
+          "icon": { "size": "UDim2.new(0.249, 0, 0.914, 0)", "position": "UDim2.new(0.095, 0, 0.019, 0)", "scaleType": "Fit" },
+          "purchase": { "class": "ImageButton", "size": "UDim2.new(0.368, 0, 0.229, 0)", "position": "UDim2.new(0.330, 0, 0.662, 0)", "scaleType": "Fit", "hasUIScale": true },
+          "purchaseIcon": { "size": "UDim2.new(0.298, 0, 0.781, 0)", "position": "UDim2.new(0.137, 0, 0.06, 0)", "image": "rbxassetid://80308670743296" },
+          "purchasePrice": { "size": "UDim2.new(0.525, 0, 0.856, 0)", "position": "UDim2.new(0.296, 0, 0.032, 0)", "font": "ComicNeueAngular Bold", "uiStroke": 2.1 },
+          "clippedZone": { "size": "UDim2.new(1, 0, 1, 0)", "position": "UDim2.new(0.5, 0, 0.5, 0)", "anchorPoint": "0.5, 0.5", "zIndex": 0, "hasUICorner": true },
+          "sunRays": { "image": "rbxassetid://79895211168184", "size": "UDim2.new(0.544, 0, 0.984, 0)", "position": "UDim2.new(0.233, 0, 0.457, 0)", "anchorPoint": "0.5, 0.5", "imageColor3": "255, 253, 247", "imageTransparency": 0.31, "zIndex": 0 }
+        }
+      },
+      {
+        "name": "moneyCard",
+        "class": "ImageLabel",
+        "size": "UDim2.new(0.492, 0, 0.95, 0)",
+        "backgroundTransparency": 1,
+        "clipsDescendants": true,
+        "holderSize": "UDim2.new(0.995, 0, 0.13, 0)",
+        "IMPORTANT_NO_ASPECT_RATIO": "Do NOT add UIAspectRatioConstraint to the money holder. The height is set explicitly via Size.",
+        "gridPositions": { "left": "UDim2.new(0.002, 0, 0, 0)", "right": "UDim2.new(0.505, 0, 0, 0)" },
+        "children": {
+          "title": { "size": "UDim2.new(0.526, 0, 0.396, 0)", "position": "UDim2.new(-0.035, 0, 0.056, 0)", "font": "FredokaOne Bold", "uiStroke": 2 },
+          "icon": { "size": "UDim2.new(0.249, 0, 0.914, 0)", "position": "UDim2.new(0.604, 0, -0.006, 0)", "image": "rbxassetid://78821837539285", "scaleType": "Fit" },
+          "purchase": { "class": "ImageButton", "size": "UDim2.new(0.439, 0, 0.298, 0)", "position": "UDim2.new(0.052, 0, 0.61, 0)", "scaleType": "Fit", "hasUIScale": true },
+          "purchaseIcon": { "size": "UDim2.new(0.312, 0, 0.879, 0)", "position": "UDim2.new(0.113, 0, 0.06, 0)", "image": "rbxassetid://80308670743296" },
+          "purchasePrice": { "size": "UDim2.new(0.533, 0, 0.833, 0)", "position": "UDim2.new(0.331, 0, 0.064, 0)", "font": "ComicNeueAngular Bold", "uiStroke": 2.1 },
+          "clippedZone": { "size": "UDim2.new(1, 0, 1, 0)", "position": "UDim2.new(0.5, 0, 0.5, 0)", "anchorPoint": "0.5, 0.5", "hasUICorner": true }
+        }
+      }
+    ],
+    "containerPattern": {
+      "IMPORTANT": "For non-card UI elements (list rows, inventory slots, stat boxes, notification bars, etc.), do NOT use stretched image assets as backgrounds. Use this pattern instead.",
+      "class": "Frame",
+      "backgroundColor3": "Color3.fromRGB(23, 23, 23)",
+      "backgroundTransparency": 0.2,
+      "uiCorner": { "cornerRadius": "UDim.new(0.08, 0)" },
+      "uiStroke": { "thickness": 1.5, "color": "0, 0, 0" },
+      "studOverlay": {
+        "class": "ImageLabel",
+        "image": "rbxassetid://15910695828",
+        "size": "UDim2.new(1, 0, 1, 0)",
+        "backgroundTransparency": 1,
+        "imageTransparency": 0.4,
+        "scaleType": "Tile",
+        "tileSize": "UDim2.new(0, 40, 0, 40)",
+        "note": "Must also have a matching UICorner so the texture clips to the rounded frame."
+      }
+    },
+    "buttonPattern": {
+      "class": "ImageButton",
+      "backgroundTransparency": 1,
+      "scaleType": "Fit",
+      "hasUIScale": true,
+      "children": {
+        "purchaseIcon": { "class": "ImageLabel", "size": "UDim2.new(0.298, 0, 0.781, 0)", "position": "UDim2.new(0.137, 0, 0.06, 0)", "image": "rbxassetid://80308670743296" },
+        "purchasePrice": { "class": "TextLabel", "size": "UDim2.new(0.525, 0, 0.856, 0)", "position": "UDim2.new(0.296, 0, 0.032, 0)", "font": "ComicNeueAngular Bold", "uiStroke": 2.1 }
+      }
+    },
+    "dialogPattern": {
+      "note": "For small confirmation/prompt dialogs (purchase confirm, yes/no, alerts). Smaller panel, no header icon, centered title, stud texture background.",
+      "panelSize": "UDim2.new(0.25, 0, 0.35, 0)",
+      "backdrop": "Full-screen Frame, black, BackgroundTransparency=0.4",
+      "background": "Stud texture ImageLabel (rbxassetid://15910695828) tiled at 40x40, ImageTransparency=0.4, ZIndex=1 inside the panel. Panel itself stays dark semi-transparent.",
+      "header": "Same ImageLabel banner asset, but NO icon. Title centered (AnchorPoint 0.5,0.5, Position 0.5,0.5 inside header). CloseButton still on the right.",
+      "content": "Centered item icon with glow underlay, prompt text below, price row with currency icon + price, then Yes/No buttons at the bottom using Accept/Decline image assets (rbxassetid://76298087250695 and rbxassetid://126479202152363) with text overlaid."
+    }
+  },
+  "colorPalette": {
+    "backgrounds": [
+      { "hex": "#000000", "rgb": "0, 0, 0", "note": "Panel root background, always with transparency ~0.55." },
+      { "hex": "#CD4907", "rgb": "205, 73, 7", "note": "InsiderFrame BackgroundColor3 (visible through CanvasGroup)." },
+      { "hex": "#FFFFFF", "rgb": "255, 255, 255", "note": "Generic frame backgrounds." },
+      { "hex": "#101015", "rgb": "16, 16, 21", "note": "Admin panel base color." },
+      { "hex": "#171717", "rgb": "23, 23, 23", "note": "Dark frames like LuckyBlock chances." }
+    ],
+    "text": [
+      { "hex": "#FFFFFF", "rgb": "255, 255, 255", "note": "Standard text — titles, prices, labels." },
+      { "hex": "#00FF00", "rgb": "0, 255, 0", "note": "Cash/currency amounts, positive feedback." },
+      { "hex": "#2FFF9E", "rgb": "47, 255, 158", "note": "Description text on gamepass/item cards." },
+      { "hex": "#FFD423", "rgb": "255, 212, 35", "note": "Yellow highlights for NEW! badges." },
+      { "hex": "#FF0000", "rgb": "255, 0, 0", "note": "Warnings, negative feedback." },
+      { "hex": "#00F1FF", "rgb": "0, 241, 255", "note": "Action headers and buttons." }
+    ],
+    "accents": [
+      { "hex": "#FF9520", "rgb": "255, 149, 32", "note": "Orange glow tint." },
+      { "hex": "#FFF800", "rgb": "255, 248, 0", "note": "Yellow glow tint." },
+      { "hex": "#27FF00", "rgb": "39, 255, 0", "note": "Green glow tint." },
+      { "hex": "#FF0000", "rgb": "255, 0, 0", "note": "Red glow tint." }
+    ],
+    "borders": [
+      { "hex": "#000000", "rgb": "0, 0, 0", "note": "Standard thick UIStroke on everything." }
+    ]
+  },
+  "gradients": [],
+  "images": {
+    "headers": [
+      { "id": "rbxassetid://139872784959993", "purpose": "MainShop header banner image" },
+      { "id": "rbxassetid://99092746223643", "purpose": "Shop header icon (left of title)" }
+    ],
+    "cards": [
+      { "id": "rbxassetid://76309595287087", "purpose": "Gamepass card background (VIP style)" },
+      { "id": "rbxassetid://89247314503392", "purpose": "Gamepass card background (2x Money style)" },
+      { "id": "rbxassetid://116663362953939", "purpose": "Gamepass card background (SpeedCoil style)" },
+      { "id": "rbxassetid://88273493633477", "purpose": "Gamepass card background (GravityCoil style)" },
+      { "id": "rbxassetid://79796338380815", "purpose": "Money pack card background (small: 50k/10k)" },
+      { "id": "rbxassetid://125638214222807", "purpose": "Money pack card background (large: Mega 1m)" }
+    ],
+    "buttons": [
+      { "id": "rbxassetid://121960215707315", "purpose": "Gamepass purchase button (Robux)" },
+      { "id": "rbxassetid://128980898851544", "purpose": "Money pack purchase button (Robux)" },
+      { "id": "rbxassetid://96294126743545", "purpose": "Mega pack purchase button (Robux)" },
+      { "id": "rbxassetid://89121687445756", "purpose": "Green button base (generic)" },
+      { "id": "rbxassetid://94011067623519", "purpose": "Purchase button base (generic)" },
+      { "id": "rbxassetid://77193702946725", "purpose": "Money button base" },
+      { "id": "rbxassetid://103842400049452", "purpose": "Robux button base" },
+      { "id": "rbxassetid://76298087250695", "purpose": "Accept/Yes button" },
+      { "id": "rbxassetid://126479202152363", "purpose": "Decline/No button" }
+    ],
+    "icons": [
+      { "id": "rbxassetid://80308670743296", "purpose": "Robux currency icon" },
+      { "id": "rbxassetid://78821837539285", "purpose": "Cash currency icon" },
+      { "id": "rbxassetid://124332107873691", "purpose": "Close button X icon" },
+      { "id": "rbxassetid://117997645720141", "purpose": "VIP gamepass icon" },
+      { "id": "rbxassetid://116714324726733", "purpose": "2x Money gamepass icon" },
+      { "id": "rbxassetid://80304808453147", "purpose": "SpeedCoil gamepass icon" },
+      { "id": "rbxassetid://132184024338409", "purpose": "GravityCoil gamepass icon" }
+    ],
+    "decorative": [
+      { "id": "rbxassetid://79895211168184", "purpose": "SunRays background effect inside ClippedZone", "imageTransparency": 0.31, "imageColor3": "255, 253, 247" },
+      { "id": "rbxassetid://110605853785569", "purpose": "Colored glow underlay behind icons" },
+      { "id": "rbxassetid://15910695828", "purpose": "Stud texture overlay (tile)", "scaleType": "Tile", "imageTransparency": 0.4 },
+      { "id": "rbxassetid://110671551243915", "purpose": "Header pattern texture (tile)", "scaleType": "Tile" }
+    ]
+  },
+  "fonts": [
+    { "family": "rbxasset://fonts/families/FredokaOne.json", "weights": ["Regular", "Bold"], "note": "Primary font for all UI: titles, labels, descriptions." },
+    { "family": "rbxasset://fonts/families/ComicNeueAngular.json", "weights": ["Bold"], "note": "Robux price text specifically." }
+  ],
+  "strokes": [
+    { "thickness": 3.0, "color": "0, 0, 0", "use": "Panel UIStroke (Border mode), header title text." },
+    { "thickness": 2.1, "color": "0, 0, 0", "use": "Robux price text on purchase buttons." },
+    { "thickness": 2.0, "color": "0, 0, 0", "use": "Card titles, section titles, button text." },
+    { "thickness": 1.4, "color": "0, 0, 0", "use": "Description text, smaller labels." }
+  ],
+  "designLanguage": "Image-driven UI. Headers, gamepass/money cards, and buttons use pre-rendered image assets with content overlaid. All other containers (list rows, inventory slots, stat boxes, notification bars) use dark Frames with stud texture overlay — never stretched image assets. Every panel root gets a dim stud texture background (ImageTransparency 0.7, ZIndex 0). Dark semi-transparent panel roots with ClipsDescendants. CanvasGroup for content clipping. Vertical scrolling sections with manual card positioning in 2-column grids. Heavy black UIStroke on all text. FredokaOne font everywhere except Robux prices (ComicNeueAngular). ClippedZone + SunRays for decorative card effects. UIAspectRatioConstraint with exact values on panels, headers, scrollframes, and holders.",
+  "layoutRules": {
+    "headerIconTitle": "Title position X must start AFTER the icon ends (icon X + icon Width). Never let the icon overlap the title text.",
+    "noOverlap": "CRITICAL: No two sibling elements may overlap. Before positioning, verify that (position.X.Scale + size.X.Scale) of element A does not exceed position.X.Scale of adjacent element B. Same for Y axis. This applies to cards in grids, buttons inside cards, labels inside rows, and all manually positioned elements.",
+    "cardGridSpacing": "2-column grids: cards sized 0.531 wide x 0.548 tall. Left column at X=-0.02, right column at X=0.488. Top row at Y=0, bottom row at Y=0.485. These exact positions create a tight edge-to-edge fit with no visible gaps.",
+    "primaryActionVisibility": "The primary action button (Claim, Confirm, Purchase, etc.) MUST be visible without scrolling. Size the content and canvas so the button fits within the initial viewport. Never require the user to scroll to find the main CTA.",
+    "buttonPadding": "Buttons should sit flush within the content flow with minimal surrounding padding. Do not add extra UIPadding or oversized gaps around buttons.",
+    "disabledStateColors": "For claimed/completed/disabled states, use a muted but readable color from the palette (e.g. white at 0.5 transparency, or a dim version of the accent). Avoid plain grey (150,150,150) — it looks washed out against dark backgrounds.",
+    "backgroundRule": "NEVER use stretched image assets as generic container backgrounds. Image assets are ONLY for: headers (banner), gamepass/money cards (purpose-built card art), buttons (button art), and decorative elements (sunrays, glows). For everything else (rows, slots, boxes, bars), use the containerPattern: dark Frame + UICorner + tiled stud texture overlay."
+  }
+}

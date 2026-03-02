@@ -14,7 +14,7 @@ export interface UseStudioConnectionReturn {
 
 const STATUS_POLL_MS = 2000;
 const RESPONSE_POLL_MS = 500;
-const COMMAND_TIMEOUT_MS = 30000;
+const COMMAND_TIMEOUT_MS = 60000;
 
 export function useStudioConnection(): UseStudioConnectionReturn {
   const [code, setCode] = useState<string | null>(null);
@@ -96,15 +96,37 @@ export function useStudioConnection(): UseStudioConnectionReturn {
           if (Date.now() > deadline) {
             clearInterval(intervalId);
             responseIntervalsRef.current.delete(intervalId);
-            reject(new Error("Command timed out"));
+            reject(new Error("Command timed out (60s). The plugin may not have received the command, or the code was too large to execute."));
             return;
           }
-          const checkRes = await fetch(
-            `/api/studio/command?code=${code}&requestId=${requestId}`,
-          );
-          if (!checkRes.ok) return;
+
+          let checkRes: Response;
+          try {
+            checkRes = await fetch(
+              `/api/studio/command?code=${code}&requestId=${requestId}`,
+            );
+          } catch {
+            return;
+          }
+
+          if (!checkRes.ok) {
+            const errBody = await checkRes.json().catch(() => ({ error: "Unknown error" }));
+            clearInterval(intervalId);
+            responseIntervalsRef.current.delete(intervalId);
+            reject(new Error(errBody.error ?? `Server error (${checkRes.status})`));
+            return;
+          }
+
           const body = await checkRes.json();
-          if (body.response !== null) {
+
+          if (body.error) {
+            clearInterval(intervalId);
+            responseIntervalsRef.current.delete(intervalId);
+            reject(new Error(body.error));
+            return;
+          }
+
+          if (body.response !== null && body.response !== undefined) {
             clearInterval(intervalId);
             responseIntervalsRef.current.delete(intervalId);
             resolve(body.response);

@@ -1,23 +1,23 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import type { SavedStyle } from "@/lib/studio/types";
+import { STYLE_PRESETS } from "@/lib/studio/styles/presets";
 
 export function StylePicker({
-  styles,
   selectedStyleId,
   onSelect,
+  studioConnected,
+  hasUIs,
 }: {
-  styles: SavedStyle[];
-  selectedStyleId: string | null;
-  onSelect: (id: string | null) => void;
+  selectedStyleId: string;
+  onSelect: (id: string) => void;
+  studioConnected: boolean;
+  hasUIs: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const selectedStyle = selectedStyleId
-    ? styles.find((s) => s.id === selectedStyleId) ?? null
-    : null;
+  const selectedStyle = STYLE_PRESETS.find((s) => s.id === selectedStyleId);
 
   useEffect(() => {
     if (!open) return;
@@ -39,53 +39,53 @@ export function StylePicker({
     <div ref={containerRef} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 px-2.5 h-7 rounded-md border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+        className="flex items-center gap-2 px-2.5 h-7 rounded-none border border-border text-xs hover:bg-accent transition-colors"
       >
-        {selectedStyle ? selectedStyle.name : "No style"}
+        <span className="text-muted-foreground">Style</span>
+        <span className="text-foreground font-medium">{selectedStyle?.name ?? "Select"}</span>
+        <svg className="w-3 h-3 text-muted-foreground" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M3 5l3 3 3-3" />
+        </svg>
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1 w-48 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 shadow-lg z-50">
-          {styles.length === 0 ? (
-            <div className="px-3 py-2.5 text-xs text-neutral-400 dark:text-neutral-500">
-              Connect Studio to extract styles
-            </div>
-          ) : (
-            <div className="py-1">
-              <button
-                onClick={() => {
-                  onSelect(null);
-                  setOpen(false);
-                }}
-                className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
-                  selectedStyleId === null
-                    ? "text-neutral-900 dark:text-neutral-100 bg-neutral-100 dark:bg-neutral-800"
-                    : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-                }`}
-              >
-                No style
-              </button>
-              {styles.map((style) => (
+        <div className="absolute top-full left-0 mt-1 w-56 rounded-none border border-border bg-background z-50">
+          <div className="py-1">
+            {STYLE_PRESETS.map((preset) => {
+              const disabled = preset.requiresStudio === true && (!studioConnected || !hasUIs);
+
+              return (
                 <button
-                  key={style.id}
+                  key={preset.id}
                   onClick={() => {
-                    onSelect(style.id);
+                    if (disabled) return;
+                    onSelect(preset.id);
                     setOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
-                    selectedStyleId === style.id
-                      ? "text-neutral-900 dark:text-neutral-100 bg-neutral-100 dark:bg-neutral-800"
-                      : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                  disabled={disabled}
+                  className={`w-full text-left px-3 py-2 transition-colors ${
+                    disabled
+                      ? "opacity-40 cursor-not-allowed"
+                      : selectedStyleId === preset.id
+                        ? "bg-accent"
+                        : "hover:bg-accent/50"
                   }`}
                 >
-                  <span className="block">{style.name}</span>
-                  <span className="text-[10px] text-neutral-400 dark:text-neutral-500">
-                    {style.tokens.colors.length} colors
+                  <span className="block text-xs font-medium text-foreground">
+                    {preset.name}
+                    {disabled && (
+                      <span className="ml-1.5 text-[10px] font-normal text-muted-foreground">
+                        {!studioConnected ? "(connect Studio)" : "(no UIs found)"}
+                      </span>
+                    )}
+                  </span>
+                  <span className="block text-[10px] text-muted-foreground">
+                    {preset.description}
                   </span>
                 </button>
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

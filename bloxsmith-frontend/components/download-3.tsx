@@ -37,7 +37,7 @@ const fragmentShader = `
   float satinLines(vec2 uv, float time) {
     float n = 0.0;
     vec2 p = uv;
-    
+
     for (int i = 0; i < 3; i++) {
       float fi = float(i);
       float baseAngle = pow(fi, 2.0) * 1.15;
@@ -45,7 +45,7 @@ const fragmentShader = `
       float speed = mix(0.3, 0.6, hash(vec2(fi, 1.0)));
       float amplitude = mix(0.4, 0.8, hash(vec2(fi, 2.0)));
       float angle = baseAngle + mix(-1.0, 1.0, noiseFactor) * amplitude + sin(time * speed + fi * 2.0) * amplitude;
-      
+
       float cs = cos(angle);
       float sn = sin(angle);
       mat2 rot = mat2(cs, -sn, sn, cs);
@@ -58,23 +58,23 @@ const fragmentShader = `
   void main() {
     vec2 uv = vUv * 2.0 - 1.0;
     uv.x *= uResolution.x / uResolution.y;
-    
+
     float warp = satinLines(uv * 2.0, uTime);
-    
+
     vec3 N = normalize(vec3(
       warp - satinLines(uv * 2.0 + vec2(0.15, 0.0), uTime),
       warp - satinLines(uv * 2.0 + vec2(0.0, 0.15), uTime),
       0.3
     ));
-    
+
     vec3 L = normalize(vec3(0.4, 0.7, 1.0));
     vec3 V = normalize(vec3(0.6, 0.4, 1.0));
     vec3 H = normalize(L + V);
-    
+
     float hn = max(dot(H, N), 0.0);
     float sheen = pow(hn, 12.0) * 0.8;
     float fres = pow(1.0 - max(dot(N, V), 0.0), 2.5) * 0.4;
-    
+
     float effect = sheen + fres;
     gl_FragColor = vec4(vec3(1.0), effect * 0.35);
   }
@@ -116,7 +116,7 @@ export function Download3() {
   return (
     <section
       id="plugin"
-      className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-neutral-950"
+      className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-background"
       aria-label="Studio plugin"
     >
       <div className="max-w-[1100px] mx-auto w-full">
@@ -126,21 +126,21 @@ export function Download3() {
           transition={{ duration: 0.5 }}
           className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 lg:gap-12 mb-8 sm:mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-foreground">
             Studio Plugin
           </h1>
 
           <div className="flex flex-col gap-5 lg:max-w-md">
-            <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed">
-              One free plugin for everything. Import generated UIs, builds, and
-              audio into Roblox Studio with a single click.
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+              One free plugin for everything. Import generated UIs into Roblox
+              Studio with a single click.
             </p>
 
             <motion.a
-              href="#"
+              href="/plugin"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 border border-amber-500 text-amber-600 dark:text-amber-400 dark:border-amber-400 rounded-full text-sm font-medium hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors cursor-pointer self-start"
+              className="inline-flex items-center gap-2 px-5 py-2.5 border border-forge text-forge rounded-none text-sm font-medium hover:bg-forge/10 transition-colors cursor-pointer self-start"
             >
               <Download className="w-4 h-4" />
               Get Plugin Free
@@ -152,7 +152,7 @@ export function Download3() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="relative w-full max-h-[300px] aspect-video sm:aspect-2/1 rounded-3xl bg-amber-500 overflow-hidden"
+          className="relative w-full max-h-[300px] aspect-video sm:aspect-2/1 rounded-none bg-secondary overflow-hidden"
         >
           <div className="absolute inset-0 w-full h-full">
             <Canvas
@@ -167,9 +167,9 @@ export function Download3() {
 
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <img
-              src="/mock-logos/spherule.svg"
-              alt="Spherule wordmark"
-              className="w-48 sm:w-64 md:w-80 lg:w-96 h-auto brightness-0 invert"
+              src="/logos/bloxsmith-wordmark.svg"
+              alt="Bloxsmith"
+              className="w-48 sm:w-64 md:w-80 lg:w-96 h-auto"
             />
           </div>
         </motion.div>

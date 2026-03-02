@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 export default function Comparison1() {
   const features = [
     {
-      name: "All-in-one platform (UI + builds + audio)",
+      name: "AI-powered UI generation with style presets",
       brand1: true,
       brand2: false,
     },
@@ -16,12 +16,12 @@ export default function Comparison1() {
       brand2: false,
     },
     {
-      name: "Flat pricing, no credit/token burn",
+      name: "Pay-per-token pricing, no subscriptions",
       brand1: true,
       brand2: false,
     },
     {
-      name: "Bring your own AI key (BYOK)",
+      name: "3 free generations to start",
       brand1: true,
       brand2: false,
     },
@@ -33,8 +33,8 @@ export default function Comparison1() {
   ];
 
   return (
-    <section className="relative w-full bg-white px-8 py-12 dark:bg-neutral-950">
-      <div className="mx-auto w-full max-w-[1400px]">
+    <section className="relative w-full bg-background px-8 py-12">
+      <div className="mx-auto w-full max-w-5xl">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
           {/* Left Column - Info */}
           <motion.div
@@ -44,19 +44,19 @@ export default function Comparison1() {
             transition={{ duration: 0.6 }}
             className="flex flex-col"
           >
-            <h2 className="mb-6 text-4xl font-medium tracking-tight text-neutral-950 dark:text-white">
+            <h2 className="mb-6 text-4xl font-medium tracking-tight text-foreground">
               Bloxsmith vs. Others
             </h2>
-            <p className="mb-8 text-md max-w-md leading-relaxed text-neutral-600 dark:text-neutral-400">
+            <p className="mb-8 text-md max-w-md leading-relaxed text-muted-foreground">
               Other Roblox AI tools are single-purpose and burn through credits.
-              Bloxsmith gives you UI, builds, and audio generation in one
-              platform with flat pricing and no token anxiety.
+              Bloxsmith generates styled UIs matched to real game aesthetics
+              with transparent, pay-per-token pricing.
             </p>
             <div>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full rounded-full bg-neutral-950 px-8 py-4 text-base font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200 md:w-auto"
+                className="w-full rounded-none bg-foreground px-8 py-4 text-base font-medium text-background transition-colors hover:bg-foreground/90 md:w-auto"
               >
                 Try Bloxsmith Free
               </motion.button>
@@ -74,7 +74,7 @@ export default function Comparison1() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="flex items-center"
               >
-                <span className="text-2xl font-bold text-neutral-950 dark:text-white md:text-3xl">
+                <span className="text-2xl font-bold text-foreground md:text-3xl">
                   Bloxsmith
                 </span>
               </motion.div>
@@ -85,7 +85,7 @@ export default function Comparison1() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="flex items-center"
               >
-                <span className="text-2xl font-bold tracking-wider text-neutral-950 dark:text-white md:text-3xl">
+                <span className="text-2xl font-bold tracking-wider text-foreground md:text-3xl">
                   Others
                 </span>
               </motion.div>
@@ -105,20 +105,20 @@ export default function Comparison1() {
                   {/* Brand 1 Feature */}
                   <div className="flex items-center gap-3 py-4">
                     <div
-                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-none ${
                         feature.brand1
-                          ? "bg-neutral-950 dark:bg-white"
-                          : "border-2 border-neutral-300 dark:border-neutral-700"
+                          ? "bg-foreground"
+                          : "border-2 border-border"
                       }`}
                     >
                       {feature.brand1 && (
                         <Check
-                          className="h-4 w-4 text-white dark:text-neutral-950"
+                          className="h-4 w-4 text-background"
                           strokeWidth={3}
                         />
                       )}
                     </div>
-                    <span className="text-sm font-medium text-neutral-950 dark:text-white md:text-base">
+                    <span className="text-sm font-medium text-foreground md:text-base">
                       {feature.name}
                     </span>
                   </div>
@@ -126,15 +126,15 @@ export default function Comparison1() {
                   {/* Brand 2 Feature */}
                   <div className="flex items-center gap-3 py-4">
                     <div
-                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-none ${
                         feature.brand2
-                          ? "bg-neutral-950 dark:bg-white"
-                          : "border-2 border-neutral-300 dark:border-neutral-700"
+                          ? "bg-foreground"
+                          : "border-2 border-border"
                       }`}
                     >
                       {feature.brand2 && (
                         <Check
-                          className="h-4 w-4 text-white dark:text-neutral-950"
+                          className="h-4 w-4 text-background"
                           strokeWidth={3}
                         />
                       )}
@@ -142,8 +142,8 @@ export default function Comparison1() {
                     <span
                       className={`text-sm font-medium md:text-base ${
                         feature.brand2
-                          ? "text-neutral-950 dark:text-white"
-                          : "text-neutral-400 dark:text-neutral-600"
+                          ? "text-foreground"
+                          : "text-muted-foreground"
                       }`}
                     >
                       {feature.name}
