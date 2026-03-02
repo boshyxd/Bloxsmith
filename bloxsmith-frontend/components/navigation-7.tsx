@@ -33,7 +33,7 @@ export function Navigation7() {
     null,
   );
 
-  if (pathname.startsWith("/forge")) return null;
+  if (pathname.startsWith("/forge") || pathname.startsWith("/auth")) return null;
 
   const navItems: NavItem[] = [
     {

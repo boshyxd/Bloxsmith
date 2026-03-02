@@ -7,6 +7,8 @@ import * as THREE from "three";
 import { motion } from "motion/react";
 import { ArrowRight, Github } from "lucide-react";
 import Image from "next/image";
+import LiquidLines from "@/components/liquid-lines";
+
 
 const carouselVertexShader = `
   varying vec2 vUv;
@@ -438,6 +440,19 @@ function LoadingFallback() {
 export function Hero7() {
   return (
     <section className="relative w-full min-h-screen bg-background overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <LiquidLines
+          speed={0.3}
+          iterations={3}
+          lineColor="#ffffff"
+          lightBackground="#1a1a1a"
+          darkBackground="#1a1a1a"
+          brightness={1.5}
+          opacity={0.4}
+          scale={0.3}
+        />
+      </div>
+      <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 50% at 50% 0%, hsl(0 0% 10%) 0%, hsl(0 0% 10% / 0.95) 40%, hsl(0 0% 10% / 0.7) 65%, transparent 100%)", height: "600px" }} />
       <div className="absolute top-0 left-0 right-0 z-20 flex flex-col items-start sm:items-center text-left sm:text-center pt-10 sm:pt-12 md:pt-14 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
