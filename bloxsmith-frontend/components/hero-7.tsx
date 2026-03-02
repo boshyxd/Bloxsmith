@@ -7,7 +7,7 @@ import * as THREE from "three";
 import { motion } from "motion/react";
 import { ArrowRight, Github } from "lucide-react";
 import Image from "next/image";
-import LiquidLines from "@/components/liquid-lines";
+import DitherWave from "@/components/dither-wave";
 
 
 const carouselVertexShader = `
@@ -441,15 +441,16 @@ export function Hero7() {
   return (
     <section className="relative w-full min-h-screen bg-background overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <LiquidLines
-          speed={0.3}
-          iterations={3}
-          lineColor="#ffffff"
-          lightBackground="#1a1a1a"
-          darkBackground="#1a1a1a"
-          brightness={1.5}
-          opacity={0.4}
-          scale={0.3}
+        <DitherWave
+          width="100%"
+          height="100%"
+          speed={0.9}
+          intensity={1.2}
+          scale={6.5}
+          downScale={0.7}
+          primaryColor="#4a4a4a"
+          secondaryColor="#2e2e2e"
+          tertiaryColor="#0a0a0a"
         />
       </div>
       <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 50% at 50% 0%, hsl(0 0% 10%) 0%, hsl(0 0% 10% / 0.95) 40%, hsl(0 0% 10% / 0.7) 65%, transparent 100%)", height: "600px" }} />
