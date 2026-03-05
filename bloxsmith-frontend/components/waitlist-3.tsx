@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
+import Grainient from "./Grainient";
 
 export default function Waitlist3() {
   const [email, setEmail] = useState("");
@@ -40,8 +41,34 @@ export default function Waitlist3() {
   };
 
   return (
-    <section className="w-full min-h-screen flex items-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
-      <div className="max-w-[1400px] mx-auto w-full">
+    <section className="w-full min-h-screen flex items-center py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <Grainient
+          color1="#171717"
+          color2="#404040"
+          color3="#262626"
+          timeSpeed={0.15}
+          colorBalance={0}
+          warpStrength={1}
+          warpFrequency={5}
+          warpSpeed={1.5}
+          warpAmplitude={50}
+          blendAngle={0}
+          blendSoftness={0.05}
+          rotationAmount={500}
+          noiseScale={2}
+          grainAmount={0.1}
+          grainScale={2}
+          grainAnimated={false}
+          contrast={1.5}
+          gamma={1}
+          saturation={0.2}
+          centerX={0}
+          centerY={0}
+          zoom={0.9}
+        />
+      </div>
+      <div className="max-w-[1400px] mx-auto w-full relative z-10">
         <div className="flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
