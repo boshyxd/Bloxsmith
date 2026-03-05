@@ -1,5 +1,5 @@
-import { Auth2 } from "@/components/auth-2";
+import { redirect } from "next/navigation"
 
 export default function AuthPage() {
-  return <Auth2 />;
+  redirect("/waitlist")
 }

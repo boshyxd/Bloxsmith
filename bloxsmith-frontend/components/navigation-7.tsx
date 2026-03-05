@@ -4,8 +4,6 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { useCredits } from "@/hooks/use-credits";
 
 interface DropdownItem {
   title: string;
@@ -25,8 +23,6 @@ interface NavItem {
 
 export function Navigation7() {
   const pathname = usePathname();
-  const { user } = useAuth();
-  const { balanceCents } = useCredits();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileExpandedItem, setMobileExpandedItem] = useState<string | null>(
@@ -185,20 +181,11 @@ export function Navigation7() {
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
             {/* Desktop Buttons */}
-            {user ? (
-              <a href="/profile" className="hidden md:block px-3 h-8 bg-secondary hover:bg-accent rounded-none text-sm font-medium tracking-tight text-foreground transition-colors leading-8">
-                ${(balanceCents / 100).toFixed(2)} | Profile
-              </a>
-            ) : (
-              <a href="/auth" className="hidden md:block px-3 h-8 bg-secondary hover:bg-accent rounded-none text-sm font-medium tracking-tight text-foreground transition-colors leading-8">
-                Log in
-              </a>
-            )}
             <a
-              href="/forge/ui"
+              href="/waitlist"
               className="px-3 h-8 bg-foreground hover:bg-foreground/90 text-background rounded-none text-sm font-medium tracking-tight transition-colors leading-8"
             >
-              {user ? "Open Forge" : "Start Free"}
+              Join Waitlist
             </a>
 
             {/* Mobile Menu Button */}
@@ -348,17 +335,8 @@ export function Navigation7() {
               transition={{ duration: 0.3, delay: 0.2 }}
               className="fixed bottom-0 left-0 right-0 p-4 sm:p-6 space-y-3 bg-background border-t border-border"
             >
-              {user ? (
-                <a href="/profile" className="w-full block px-4 py-3 bg-secondary hover:bg-accent rounded-none text-sm font-medium text-foreground transition-colors text-center">
-                  ${(balanceCents / 100).toFixed(2)} | Profile
-                </a>
-              ) : (
-                <a href="/auth" className="w-full block px-4 py-3 bg-secondary hover:bg-accent rounded-none text-sm font-medium text-foreground transition-colors text-center">
-                  Log in
-                </a>
-              )}
-              <a href="/forge/ui" className="w-full block px-4 py-3 bg-foreground hover:bg-foreground/90 text-background rounded-none text-sm font-medium transition-colors text-center">
-                {user ? "Open Forge" : "Start Free"}
+              <a href="/waitlist" className="w-full block px-4 py-3 bg-foreground hover:bg-foreground/90 text-background rounded-none text-sm font-medium transition-colors text-center">
+                Join Waitlist
               </a>
             </motion.div>
           </motion.div>
