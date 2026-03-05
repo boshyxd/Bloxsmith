@@ -41,12 +41,12 @@ export default function Waitlist3() {
   };
 
   return (
-    <section className="w-full min-h-screen flex items-center py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
+    <section className="w-full h-[calc(100vh-64px)] flex items-center px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Grainient
-          color1="#171717"
-          color2="#404040"
-          color3="#262626"
+          color1="#333333"
+          color2="#e0e0e0"
+          color3="#888888"
           timeSpeed={0.15}
           colorBalance={0}
           warpStrength={1}
