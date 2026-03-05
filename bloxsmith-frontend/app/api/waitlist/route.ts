@@ -30,9 +30,7 @@ export async function POST(req: NextRequest) {
     subject: "You're on the Bloxsmith waitlist",
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
-        <div style="width: 40px; height: 40px; background: #171717; margin-bottom: 24px;">
-          <img src="https://bloxsmith.net/logos/bloxsmith-icon.svg" alt="Bloxsmith" style="width: 40px; height: 40px;" />
-        </div>
+        <img src="https://bloxsmith.net/logos/bloxsmith-wordmark.png" alt="Bloxsmith" style="height: 32px; margin-bottom: 24px;" />
         <h1 style="font-size: 20px; font-weight: 600; color: #171717; margin: 0 0 12px;">You're on the list.</h1>
         <p style="font-size: 14px; color: #525252; line-height: 1.6; margin: 0 0 24px;">
           Thanks for joining the Bloxsmith waitlist. We're building AI-powered Roblox UI generation and you'll be among the first to try it.
